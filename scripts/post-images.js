@@ -92,15 +92,15 @@ async function processWithConcurrency(items, limit, worker) {
 
 async function main() {
 	const postsDir = path.join(process.cwd(), 'src/content/posts');
-	const outputDir = path.join(process.cwd(), 'build/posts');
+	const outputDir = path.join(process.cwd(), '.svelte-kit/cloudflare/posts');
 	const cacheDir = path.join(process.cwd(), '.image-cache');
 
 	if (!fs.existsSync(postsDir)) {
 		console.log('[post-images] src/content/posts 不存在，跳过');
 		return;
 	}
-	if (!fs.existsSync(path.join(process.cwd(), 'build'))) {
-		console.error('[post-images] build/ 目录不存在，请先执行 vite build');
+	if (!fs.existsSync(path.join(process.cwd(), '.svelte-kit/cloudflare'))) {
+		console.error('[post-images] .svelte-kit/cloudflare/ 目录不存在，请先执行 vite build');
 		process.exit(1);
 	}
 
