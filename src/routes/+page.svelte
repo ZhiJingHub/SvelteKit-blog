@@ -54,6 +54,9 @@
 				>
 					<Icon icon={link.icon} class="w-5 h-5" />
 					{link.label}
+					{#if isExternal}
+						<Icon icon="mdi:open-in-new" class="w-3.5 h-3.5 opacity-50" />
+					{/if}
 				</Button>
 			</a>
 		{/each}
