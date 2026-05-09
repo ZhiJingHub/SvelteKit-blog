@@ -1,4 +1,4 @@
-import adapter from '@sveltejs/adapter-static';
+import adapter from '@sveltejs/adapter-cloudflare';
 import { mdsvex } from 'mdsvex';
 import mdsvexConfig from './src/lib/config/mdsvex.config.js';
 
@@ -15,26 +15,7 @@ const config = {
 		handler(warning);
 	},
 	kit: {
-		adapter: adapter({
-			fallback: '404.html',
-			strict: false
-		}),
-		prerender: {
-			entries: ['*', '/robots.txt'],
-			handleHttpError: ({ path, referrer, message }) => {
-				if (path.endsWith('.avif')) return;
-				console.warn(`[prerender] HTTP error at ${path} (from ${referrer}): ${message}`);
-			},
-			handleMissingId: ({ path, id, referrers }) => {
-				console.warn(`[prerender] missing id "${id}" at ${path} (from ${referrers.join(', ')})`);
-			},
-			handleEntryGeneratorMismatch: ({ entry, generatedFromId, matchedId }) => {
-				console.warn(`[prerender] entry mismatch: ${entry} (from ${generatedFromId}, matched ${matchedId})`);
-			}
-		},
-		paths: {
-			base: process.env.NODE_ENV === 'production' ? '' : ''
-		}
+		adapter: adapter(),
 	}
 };
 
