@@ -5,7 +5,10 @@
 	"type": "module",
 	"pnpm": {
 		"onlyBuiltDependencies": [
-			"sharp"
+			"sharp",
+			"@tailwindcss/oxide",
+			"workerd",
+			"esbuild"
 		]
 	},
 	"scripts": {
