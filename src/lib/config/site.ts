@@ -22,6 +22,17 @@ export const siteConfig = {
 				icon: 'simple-icons:github',
 				url: 'https://github.com/ZhiJingHub',
 				color: '#333333'
+			},
+			{
+				name: 'Telegram',
+				icon: 'simple-icons:telegram',
+				url: 'https://t.me/ZhiJing_PM_Bot',
+				color: '#0088cc'
+			},
+			{
+				name: '邮箱',
+				icon: 'mdi:email-outline',
+				url: 'mailto:me@iwexe.top'
 			}
 		]
 	},
