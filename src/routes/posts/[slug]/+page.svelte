@@ -1,6 +1,8 @@
 <script lang="ts">
-	import { tick, onMount } from 'svelte';
+	import { tick } from 'svelte';
 	import { page } from '$app/stores';
+	import { Button } from '$lib/components/ui/button';
+	import { Badge } from '$lib/components/ui/badge';
 	import { siteConfig } from '$lib/config/site';
 	import ImageViewer from '$lib/components/ImageViewer.svelte';
 	import PostToc from '$lib/components/PostToc.svelte';
@@ -138,65 +140,70 @@
 	<meta name="twitter:description" content={data.post.metadata.description} />
 </svelte:head>
 
-<article class="container mx-auto max-w-5xl px-4 py-12">
+<article class="container mx-auto max-w-3xl px-4 py-12">
 	<div class="mb-8">
 		<a href="/posts">
-			<button class="inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium border border-border hover:bg-accent transition-colors">
-				← 返回文章列表
-			</button>
+			<Button variant="ghost">← 返回文章列表</Button>
 		</a>
 	</div>
 
-	<div class="flex gap-8">
-		<div class="flex-1 min-w-0">
-			<header class="mb-8">
-				<div class="mb-4 flex items-center gap-2">
-					{#if data.post.metadata.pinned}
-						<span class="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
-							置顶
-						</span>
-					{/if}
-					<time class="text-sm text-muted-foreground">
-						{formatDate(data.post.metadata.published)}
-					</time>
-					{#if data.post.metadata.updated}
-						<span class="text-sm text-muted-foreground">· 更新于 {formatDate(data.post.metadata.updated)}</span>
-					{/if}
-				</div>
-
-				<h1 class="mb-4 text-4xl font-bold">{data.post.metadata.title}</h1>
-
-				<p class="text-lg text-muted-foreground">
-					{data.post.metadata.description}
-				</p>
-			</header>
-
-			<div
-				bind:this={proseEl}
-				class="prose prose-neutral dark:prose-invert max-w-none break-words [overflow-wrap:anywhere]
-					prose-headings:text-foreground
-					prose-p:text-foreground
-					prose-strong:text-foreground
-					prose-a:text-primary prose-a:underline prose-a:underline-offset-4 prose-a:break-all hover:prose-a:opacity-80
-					prose-blockquote:border-l-primary prose-blockquote:text-muted-foreground
-					prose-code:bg-muted prose-code:text-foreground prose-code:rounded prose-code:px-1.5 prose-code:py-0.5 prose-code:before:content-none prose-code:after:content-none
-					prose-pre:bg-muted prose-pre:border prose-pre:border-border prose-pre:rounded-lg
-					prose-img:rounded-lg
-					prose-table:border prose-table:border-border prose-th:border prose-th:border-border prose-th:bg-muted prose-th:p-2 prose-td:border prose-td:border-border prose-td:p-2
-					prose-hr:border-border
-					prose-li:text-foreground
-				"
-			>
-				<data.component />
-			</div>
+	<header class="mb-8">
+		<div class="mb-4 flex items-center gap-2">
+			{#if data.post.metadata.pinned}
+				<Badge>置顶</Badge>
+			{/if}
+			<time class="text-sm text-muted-foreground">
+				{formatDate(data.post.metadata.published)}
+			</time>
+			{#if data.post.metadata.updated}
+				<span class="text-sm text-muted-foreground">· 更新于 {formatDate(data.post.metadata.updated)}</span>
+			{/if}
 		</div>
 
-		<aside class="hidden xl:block w-56 shrink-0">
-			<div class="sticky top-20">
-				<PostToc container={proseEl} />
+		<h1 class="mb-4 text-4xl font-bold">{data.post.metadata.title}</h1>
+
+		<p class="text-lg text-muted-foreground">
+			{data.post.metadata.description}
+		</p>
+
+		{#if data.post.metadata.image}
+			<div class="mt-6">
+				<img
+					src={data.post.metadata.image}
+					alt={data.post.metadata.title}
+					class="w-full rounded-lg object-cover"
+				/>
 			</div>
-		</aside>
+		{/if}
+	</header>
+
+	<div
+		bind:this={proseEl}
+		class="prose prose-neutral dark:prose-invert max-w-none break-words [overflow-wrap:anywhere]
+			prose-headings:text-foreground
+			prose-p:text-foreground
+			prose-strong:text-foreground
+			prose-a:text-primary prose-a:underline prose-a:underline-offset-4 prose-a:break-all hover:prose-a:opacity-80
+			prose-blockquote:border-l-primary prose-blockquote:text-muted-foreground
+			prose-code:bg-muted prose-code:text-foreground prose-code:rounded prose-code:px-1.5 prose-code:py-0.5 prose-code:before:content-none prose-code:after:content-none
+			prose-pre:bg-transparent prose-pre:p-0 prose-pre:text-foreground prose-pre:overflow-x-auto
+			prose-hr:border-border
+			prose-th:border prose-th:border-border prose-th:bg-muted
+			prose-td:border prose-td:border-border
+			prose-img:rounded-lg"
+	>
+		<data.component />
 	</div>
+
+	<PostToc container={proseEl} trigger={data.component} />
+
+	<footer class="mt-12 border-t pt-8">
+		<div class="flex justify-center">
+			<a href="/posts">
+				<Button>← 返回文章列表</Button>
+			</a>
+		</div>
+	</footer>
 </article>
 
-<ImageViewer container={proseEl} />
+<ImageViewer />

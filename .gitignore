@@ -1,5 +1,11 @@
 node_modules
 
+# Reference project (not part of this repo)
+/svaf
+
+# Image cache
+/.image-cache
+
 # Output
 .output
 .vercel

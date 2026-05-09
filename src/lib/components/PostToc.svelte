@@ -1,93 +1,174 @@
 <script lang="ts">
-	import Icon from '@iconify/svelte';
+	import { tick } from 'svelte';
+	import { fly } from 'svelte/transition';
 	import { tocFloating } from '$lib/stores/toc-floating';
 
-	let { container }: { container: HTMLDivElement | undefined } = $props();
+	let {
+		container,
+		trigger
+	}: {
+		container?: HTMLElement;
+		trigger?: unknown;
+	} = $props();
 
-	let headings = $state<Array<{ level: number; id: string; text: string }>>([]);
-	let activeId = $state('');
+	type Heading = { id: string; text: string; level: number };
 
-	function extractHeadings() {
-		if (!container) {
-			headings = [];
-			return;
-		}
-		const result: Array<{ level: number; id: string; text: string }> = [];
-		const hs = container.querySelectorAll('h2, h3, h4');
-		hs.forEach((h) => {
-			const level = parseInt(h.tagName[1]);
-			if (!h.id) {
-				h.id = `h-${h.textContent?.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9\-]/g, '') || Math.random().toString(36).slice(2, 7)}`;
-			}
-			result.push({ level, id: h.id, text: h.textContent || '' });
-		});
-		headings = result;
-		tocFloating.setAvailable(result.length > 0);
+	let headings = $state<Heading[]>([]);
+	let activeId = $state<string>('');
+	let observer: IntersectionObserver | undefined;
+
+	const mobileOpen = $derived($tocFloating);
+
+	let minLevel = $derived(headings.length ? Math.min(...headings.map((h) => h.level)) : 1);
+
+	function indentClass(level: number): string {
+		const depth = Math.max(0, level - minLevel);
+		return ['pl-3', 'pl-6', 'pl-9', 'pl-12', 'pl-14'][depth] ?? 'pl-14';
 	}
 
-	function onScroll() {
-		const hs = container?.querySelectorAll('h2[id], h3[id], h4[id]');
-		if (!hs || hs.length === 0) return;
+	function slugify(text: string): string {
+		return (
+			text
+				.trim()
+				.toLowerCase()
+				.replace(/[\s　]+/g, '-')
+				.replace(/[^\p{L}\p{N}\-]/gu, '')
+				.replace(/-+/g, '-')
+				.replace(/^-|-$/g, '') || 'section'
+		);
+	}
 
-		let closest = '';
-		hs.forEach((h, i) => {
-			const rect = (h as HTMLElement).getBoundingClientRect();
-			if (rect.top <= 120) {
-				closest = h.id;
-			}
-		});
+	async function rebuild() {
+		await tick();
+		if (!container) return;
 
-		// 滚动到底部时高亮最后一个
-		if (!closest) {
-			const last = hs[hs.length - 1] as HTMLElement;
-			const lastRect = last.getBoundingClientRect();
-			if (lastRect.top < 0) {
-				closest = last.id;
+		observer?.disconnect();
+		const els = Array.from(
+			container.querySelectorAll<HTMLHeadingElement>('h1, h2, h3, h4, h5, h6')
+		);
+
+		const seen = new Map<string, number>();
+		const list: Heading[] = [];
+		for (const el of els) {
+			const text = (el.textContent || '').trim();
+			if (!text) continue;
+			let id = el.id || slugify(text);
+			if (seen.has(id)) {
+				const n = (seen.get(id) || 1) + 1;
+				seen.set(id, n);
+				id = `${id}-${n}`;
+			} else {
+				seen.set(id, 1);
 			}
+			el.id = id;
+			list.push({ id, text, level: Number(el.tagName.slice(1)) });
 		}
+		headings = list;
+		tocFloating.setAvailable(list.length > 0);
 
-		activeId = closest;
+		if (list.length === 0) return;
+
+		observer = new IntersectionObserver(
+			(entries) => {
+				const visible = entries
+					.filter((e) => e.isIntersecting)
+					.sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+				if (visible.length > 0) {
+					activeId = (visible[0].target as HTMLElement).id;
+				}
+			},
+			{ rootMargin: '-80px 0px -60% 0px', threshold: 0 }
+		);
+		for (const el of els) observer.observe(el);
+
+		const firstVisible = els.find((el) => {
+			const r = el.getBoundingClientRect();
+			return r.bottom > 80;
+		});
+		activeId = (firstVisible || els[0]).id;
 	}
 
 	$effect(() => {
-		// container 可能异步出现，等待一个微任务
-		void Promise.resolve().then(() => extractHeadings());
+		void trigger;
+		void container;
+		rebuild();
+		return () => {
+			observer?.disconnect();
+			tocFloating.reset();
+		};
 	});
 
-	let handleScroll = () => {};
-
-	$effect(() => {
-		window.removeEventListener('scroll', handleScroll);
-		if (container) {
-			handleScroll = () => onScroll();
-			window.addEventListener('scroll', handleScroll, { passive: true });
-			onScroll();
-		}
-		return () => window.removeEventListener('scroll', handleScroll);
-	});
+	function handleClick(e: MouseEvent, id: string) {
+		const el = document.getElementById(id);
+		if (!el) return;
+		e.preventDefault();
+		const top = el.getBoundingClientRect().top + window.scrollY - 72;
+		window.scrollTo({ top, behavior: 'smooth' });
+		history.replaceState(null, '', `#${id}`);
+		tocFloating.setOpen(false);
+	}
 </script>
 
 {#if headings.length > 0}
-	<div class="flex flex-col gap-1">
-		<div class="flex items-center gap-2 mb-2">
-			<Icon icon="mdi:format-list-bulleted" class="w-4 h-4 text-muted-foreground" />
-			<span class="text-sm font-medium text-muted-foreground">目录</span>
+	<aside
+		class="hidden xl:block fixed top-24 right-[max(1rem,calc((100vw-48rem)/2-18rem))] w-56 max-h-[calc(100vh-8rem)] overflow-y-auto pr-2 text-sm z-30"
+		aria-label="目录"
+	>
+		<div class="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+			目录
 		</div>
-		<nav class="flex flex-col gap-0.5">
-			{#each headings as heading (heading.id)}
-				<a
-					href="#{heading.id}"
-					class="block py-1 text-sm transition-colors hover:text-foreground truncate"
-					class:text-primary={heading.id === activeId}
-					class:text-muted-foreground={heading.id !== activeId}
-					class:pl-0={heading.level === 2}
-					class:pl-4={heading.level === 3}
-					class:pl-8={heading.level === 4}
-					class:font-medium={heading.id === activeId}
-				>
-					{heading.text}
-				</a>
+		<ul class="space-y-1 border-l border-border">
+			{#each headings as h (h.id)}
+				<li>
+					<a
+						href={`#${h.id}`}
+						onclick={(e) => handleClick(e, h.id)}
+						class="block py-1 pr-2 border-l-2 -ml-px transition-colors {indentClass(
+							h.level
+						)} {activeId === h.id
+							? 'border-primary text-foreground font-medium'
+							: 'border-transparent text-muted-foreground hover:text-foreground hover:border-muted-foreground/40'}"
+					>
+						{h.text}
+					</a>
+				</li>
 			{/each}
-		</nav>
-	</div>
+		</ul>
+	</aside>
+
+	{#if mobileOpen}
+		<div class="xl:hidden">
+			<button
+				type="button"
+				aria-label="关闭目录"
+				class="fixed inset-0 z-40 bg-background/60 backdrop-blur-sm"
+				onclick={() => tocFloating.setOpen(false)}
+			></button>
+			<div
+				transition:fly={{ y: 20, duration: 200 }}
+				class="fixed bottom-24 right-6 z-50 w-72 max-h-[60vh] overflow-y-auto rounded-lg border border-border bg-card shadow-xl p-4"
+			>
+				<div class="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+					目录
+				</div>
+				<ul class="space-y-1 border-l border-border text-sm">
+					{#each headings as h (h.id)}
+						<li>
+							<a
+								href={`#${h.id}`}
+								onclick={(e) => handleClick(e, h.id)}
+								class="block py-1 pr-2 border-l-2 -ml-px transition-colors {indentClass(
+									h.level
+								)} {activeId === h.id
+									? 'border-primary text-foreground font-medium'
+									: 'border-transparent text-muted-foreground hover:text-foreground'}"
+							>
+								{h.text}
+							</a>
+						</li>
+					{/each}
+				</ul>
+			</div>
+		</div>
+	{/if}
 {/if}

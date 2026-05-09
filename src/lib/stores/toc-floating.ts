@@ -1,23 +1,13 @@
-import { writable } from 'svelte/store';
-import { browser } from '$app/environment';
+import { writable, derived } from 'svelte/store';
 
-export const tocFloating = (() => {
-	const open = writable(false);
-	let available = writable(true);
+const open = writable(false);
+const available = writable(false);
 
-	function toggle() {
-		open.update(v => !v);
-	}
-
-	function setAvailable(v: boolean) {
-		available.set(v);
-	}
-
-	return {
-		subscribe: open.subscribe,
-		toggle,
-		open,
-		available,
-		setAvailable
-	};
-})();
+export const tocFloating = {
+	subscribe: open.subscribe,
+	available,
+	toggle: () => open.update(v => !v),
+	setOpen: (v: boolean) => open.set(v),
+	setAvailable: (v: boolean) => available.set(v),
+	reset: () => open.set(false)
+};

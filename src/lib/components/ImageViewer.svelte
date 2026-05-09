@@ -1,62 +1,36 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-
-	let { container }: { container: HTMLDivElement | undefined } = $props();
-
-	let gallery: HTMLDivElement | undefined = $state();
-
-	let initialized = $state(false);
-
-	function initGallery() {
-		if (initialized || !container) return;
-		initialized = true;
-
-		import('photoswipe').then(async (mod) => {
-			const PhotoSwipe = mod.default;
-			const PhotoSwipeLightbox = (await import('photoswipe/lightbox')).default;
-
-			if (!gallery) return;
-
-			const lightbox = new PhotoSwipeLightbox({
-				gallery,
-				children: 'a[data-pswp]',
-				pswpModule: PhotoSwipe
-			});
-
-			lightbox.init();
-
-			const images = container.querySelectorAll('img');
-			images.forEach((img) => {
-				const parent = img.parentElement;
-				if (parent && parent.tagName === 'A' && parent.hasAttribute('data-pswp')) return;
-
-				const src = img.getAttribute('src');
-				if (!src) return;
-
-				const a = document.createElement('a');
-				a.href = src;
-				a.setAttribute('data-pswp', '');
-				a.setAttribute('data-pswp-width', String(img.naturalWidth || 1200));
-				a.setAttribute('data-pswp-height', String(img.naturalHeight || 800));
-
-				const alt = img.getAttribute('alt');
-				if (alt) {
-					a.setAttribute('data-pswp-caption', alt);
-				}
-
-				img.parentNode?.insertBefore(a, img);
-				a.appendChild(img);
-			});
-		});
-	}
+	import PhotoSwipeLightbox from 'photoswipe/lightbox';
+	import 'photoswipe/style.css';
 
 	onMount(() => {
-		initGallery();
-	});
+		const lightbox = new PhotoSwipeLightbox({
+			gallery: '.prose',
+			children: 'img',
+			pswpModule: () => import('photoswipe')
+		});
 
-	$effect(() => {
-		if (container) initGallery();
+		lightbox.addFilter('itemData', (itemData, index) => {
+			const img = itemData.element as HTMLImageElement;
+			return {
+				src: img.src,
+				width: img.naturalWidth || 800,
+				height: img.naturalHeight || 600,
+				alt: img.alt || ''
+			};
+		});
+
+		lightbox.on('uiRegister', () => {
+			const images = document.querySelectorAll('.prose img');
+			images.forEach((img) => {
+				(img as HTMLElement).style.cursor = 'pointer';
+			});
+		});
+
+		lightbox.init();
+
+		return () => {
+			lightbox.destroy();
+		};
 	});
 </script>
-
-<div bind:this={gallery} class="hidden" aria-hidden="true"></div>

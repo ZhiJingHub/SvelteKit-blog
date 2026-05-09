@@ -1,13 +1,12 @@
 <script lang="ts">
 	import { fly } from 'svelte/transition';
 	import Icon from '@iconify/svelte';
-	import { page } from '$app/stores';
 	import { tocFloating } from '$lib/stores/toc-floating';
 
 	let scrollY = $state(0);
 	let showButton = $derived(scrollY > 100);
-
 	let showTocButton = $derived($tocFloating.available);
+	let isTocOpen = $derived($tocFloating);
 
 	const scrollToTop = () => {
 		window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -22,11 +21,11 @@
 			<button
 				onclick={() => tocFloating.toggle()}
 				aria-label="目录"
-				aria-expanded={$tocFloating.open}
+				aria-expanded={isTocOpen}
 				class="inline-flex items-center justify-center rounded-md w-12 h-12 shadow-lg hover:shadow-xl bg-card border border-border hover:bg-accent transition-colors"
 			>
 				<Icon
-					icon={$tocFloating.open ? 'mdi:close' : 'mdi:format-list-bulleted'}
+					icon={isTocOpen ? 'mdi:close' : 'mdi:format-list-bulleted'}
 					class="w-5 h-5"
 				/>
 			</button>
