@@ -2,25 +2,25 @@ export const siteConfig = {
 	name: 'My Blog',
 	title: 'My Blog',
 	subtitle: 'A personal blog',
-	url: 'https://example.com',
+	url: 'https://iwexe.top',
 	icon: '/favicon.svg',
 	description: '一个专注于技术分享的个人博客',
 	keywords: ['blog', 'tech', '技术博客'],
 	lang: 'zh_CN',
 	ogImage: '/og-image.svg',
 	author: {
-		name: 'Author',
-		url: 'https://example.com'
+		name: '致靖',
+		url: 'https://iwexe.top'
 	},
 	bio: {
 		avatar: '/avatar.svg',
-		name: 'Author Name',
+		name: '致靖',
 		bio: 'Stay hungry, stay foolish.',
 		links: [
 			{
 				name: 'GitHub',
 				icon: 'simple-icons:github',
-				url: 'https://github.com',
+				url: 'https://github.com/ZhiJingHub',
 				color: '#333333'
 			}
 		]
