@@ -11,34 +11,26 @@
 		});
 	}
 
-	const icon = $derived.by(() => {
-		switch ($themeMode) {
-			case 'light':
-				return 'mdi:weather-sunny';
-			case 'dark':
-				return 'mdi:weather-night';
-			case 'system':
-				return 'mdi:monitor';
-		}
-	});
+	let currentMode = $derived($themeMode);
 
-	const label = $derived.by(() => {
-		switch ($themeMode) {
-			case 'light':
-				return '浅色模式';
-			case 'dark':
-				return '深色模式';
-			case 'system':
-				return '跟随系统';
-		}
-	});
+	let icon = $derived(
+		currentMode === 'light' ? 'mdi:weather-sunny' :
+		currentMode === 'dark' ? 'mdi:weather-night' :
+		'mdi:monitor'
+	);
+
+	let label = $derived(
+		currentMode === 'light' ? '浅色模式' :
+		currentMode === 'dark' ? '深色模式' :
+		'跟随系统'
+	);
 </script>
 
 <button
 	onclick={cycle}
-	class="inline-flex items-center justify-center rounded-md w-9 h-9 text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+	class="inline-flex items-center justify-center rounded-md w-9 h-9 text-muted-foreground hover:bg-accent hover:text-accent-foreground"
 	aria-label={label}
 	title={label}
 >
-	<Icon {icon} class="w-5 h-5" />
+	<Icon icon={icon} class="w-5 h-5" />
 </button>
