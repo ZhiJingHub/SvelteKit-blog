@@ -16,6 +16,14 @@ const config = {
 	},
 	kit: {
 		adapter: adapter(),
+		prerender: {
+			handleHttpError: ({ path, message }) => {
+				console.warn(`[prerender] HTTP error at ${path}: ${message}`);
+			},
+			handleMissingId: ({ path, id }) => {
+				console.warn(`[prerender] missing id "${id}" at ${path}`);
+			}
+		}
 	}
 };
 
