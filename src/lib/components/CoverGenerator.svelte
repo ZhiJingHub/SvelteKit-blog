@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import * as Tabs from '$lib/components/ui/tabs';
 	import CoverPreview from './cover/CoverPreview.svelte';
 	import TextSettings from './cover/TextSettings.svelte';
 	import IconSettings from './cover/IconSettings.svelte';
