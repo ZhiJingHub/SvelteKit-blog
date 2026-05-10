@@ -3,7 +3,7 @@
 	import { siteConfig } from '$lib/config/site';
 	import ThemeToggle from './ThemeToggle.svelte';
 
-	const isHomePage = $derived($page.route.id === '/');
+	const isHomePage = $derived($page.route?.id === '/');
 </script>
 
 {#if !isHomePage}

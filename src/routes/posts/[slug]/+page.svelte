@@ -140,29 +140,29 @@
 	<meta name="twitter:description" content={data.post.metadata.description} />
 </svelte:head>
 
-<article class="container mx-auto max-w-3xl px-4 py-12">
-	<div class="mb-8">
+<article class="container mx-auto max-w-3xl px-4 py-8 sm:py-12">
+	<div class="mb-6 sm:mb-8">
 		<a href="/posts">
-			<Button variant="ghost">← 返回文章列表</Button>
+			<Button variant="ghost" size="sm" class="sm:size-default">← 返回文章列表</Button>
 		</a>
 	</div>
 
-	<header class="mb-8">
-		<div class="mb-4 flex items-center gap-2">
+	<header class="mb-6 sm:mb-8">
+		<div class="mb-4 flex flex-wrap items-center gap-x-2 gap-y-1">
 			{#if data.post.metadata.pinned}
 				<Badge>置顶</Badge>
 			{/if}
-			<time class="text-sm text-muted-foreground">
+			<time class="text-xs sm:text-sm text-muted-foreground">
 				{formatDate(data.post.metadata.published)}
 			</time>
 			{#if data.post.metadata.updated}
-				<span class="text-sm text-muted-foreground">· 更新于 {formatDate(data.post.metadata.updated)}</span>
+				<span class="text-xs sm:text-sm text-muted-foreground">· 更新于 {formatDate(data.post.metadata.updated)}</span>
 			{/if}
 		</div>
 
-		<h1 class="mb-4 text-4xl font-bold">{data.post.metadata.title}</h1>
+		<h1 class="mb-4 text-2xl sm:text-3xl md:text-4xl font-bold">{data.post.metadata.title}</h1>
 
-		<p class="text-lg text-muted-foreground">
+		<p class="text-base sm:text-lg text-muted-foreground">
 			{data.post.metadata.description}
 		</p>
 
