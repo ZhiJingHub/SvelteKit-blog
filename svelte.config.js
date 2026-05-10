@@ -22,7 +22,8 @@ const config = {
 			},
 			handleMissingId: ({ path, id }) => {
 				console.warn(`[prerender] missing id "${id}" at ${path}`);
-			}
+			},
+			handleUnseenRoutes: 'ignore'
 		}
 	}
 };
