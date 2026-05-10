@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Icon from '@iconify/svelte';
 	import type { HTMLAttributes } from "svelte/elements";
-	import { cn, type WithElementRef, type WithoutChildren } from "$lib/utils.ts";
+	import { cn, type WithElementRef, type WithoutChildren } from "$lib/utils";
 
 	let {
 		ref = $bindable(null),

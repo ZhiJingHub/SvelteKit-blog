@@ -172,7 +172,7 @@
 
 	<Card>
 		<CardContent class="space-y-3 py-4">
-			<Tabs value={mode} onValueChange={(v) => (mode = v as ToolMode)}>
+			<Tabs value={mode} onValueChange={(v: string) => (mode = v as ToolMode)}>
 				<TabsList>
 					<TabsTrigger value="prism">{modeMetaMap.prism.name}</TabsTrigger>
 					<TabsTrigger value="shadow">{modeMetaMap.shadow.name}</TabsTrigger>
@@ -229,27 +229,27 @@
 						<div class="grid gap-5 md:grid-cols-2">
 							<div class="space-y-4 rounded-lg border bg-muted/30 p-4">
 								<h3 class="text-sm font-semibold">原图参数</h3>
-								<div class="space-y-2"><div class="flex items-center justify-between text-sm text-muted-foreground"><span>原图亮度提高 (%)</span><span class="font-mono text-foreground">{sourceBrightness}</span></div><Slider type="single" value={sourceBrightness} onValueChange={(v) => (sourceBrightness = v as number)} min={0} max={200} step={1} /></div>
-								<div class="space-y-2"><div class="flex items-center justify-between text-sm text-muted-foreground"><span>原图对比度 (%)</span><span class="font-mono text-foreground">{sourceContrast}</span></div><Slider type="single" value={sourceContrast} onValueChange={(v) => (sourceContrast = v as number)} min={10} max={300} step={1} /></div>
+								<div class="space-y-2"><div class="flex items-center justify-between text-sm text-muted-foreground"><span>原图亮度提高 (%)</span><span class="font-mono text-foreground">{sourceBrightness}</span></div><Slider type="single" value={sourceBrightness} onValueChange={(v: number) => (sourceBrightness = v as number)} min={0} max={200} step={1} /></div>
+								<div class="space-y-2"><div class="flex items-center justify-between text-sm text-muted-foreground"><span>原图对比度 (%)</span><span class="font-mono text-foreground">{sourceContrast}</span></div><Slider type="single" value={sourceContrast} onValueChange={(v: number) => (sourceContrast = v as number)} min={10} max={300} step={1} /></div>
 							</div>
 							<div class="space-y-4 rounded-lg border bg-muted/30 p-4">
 								<h3 class="text-sm font-semibold">隐藏图参数</h3>
-								<div class="space-y-2"><div class="flex items-center justify-between text-sm text-muted-foreground"><span>隐藏图亮度降低 (%)</span><span class="font-mono text-foreground">{hiddenBrightness}</span></div><Slider type="single" value={hiddenBrightness} onValueChange={(v) => (hiddenBrightness = v as number)} min={0} max={100} step={1} /></div>
-								<div class="space-y-2"><div class="flex items-center justify-between text-sm text-muted-foreground"><span>隐藏图对比度 (%)</span><span class="font-mono text-foreground">{hiddenContrast}</span></div><Slider type="single" value={hiddenContrast} onValueChange={(v) => (hiddenContrast = v as number)} min={10} max={300} step={1} /></div>
+								<div class="space-y-2"><div class="flex items-center justify-between text-sm text-muted-foreground"><span>隐藏图亮度降低 (%)</span><span class="font-mono text-foreground">{hiddenBrightness}</span></div><Slider type="single" value={hiddenBrightness} onValueChange={(v: number) => (hiddenBrightness = v as number)} min={0} max={100} step={1} /></div>
+								<div class="space-y-2"><div class="flex items-center justify-between text-sm text-muted-foreground"><span>隐藏图对比度 (%)</span><span class="font-mono text-foreground">{hiddenContrast}</span></div><Slider type="single" value={hiddenContrast} onValueChange={(v: number) => (hiddenContrast = v as number)} min={10} max={300} step={1} /></div>
 							</div>
 						</div>
 					{:else}
 						<div class="grid gap-5 md:grid-cols-2">
 							<div class="space-y-4 rounded-lg border bg-muted/30 p-4">
 								<div class="flex items-center justify-between gap-3"><Label for="shadow-colored" class="text-sm font-semibold">全彩输出</Label><Switch id="shadow-colored" bind:checked={shadowIsColored} /></div>
-								<div class="space-y-2"><div class="flex items-center justify-between text-sm text-muted-foreground"><span>黑底图缩放</span><span class="font-mono text-foreground">{shadowInnerScale.toFixed(2)}</span></div><Slider type="single" value={shadowInnerScale} onValueChange={(v) => (shadowInnerScale = v as number)} min={0} max={1} step={0.02} /></div>
-								<div class="space-y-2"><div class="flex items-center justify-between text-sm text-muted-foreground"><span>黑底图去色</span><span class="font-mono text-foreground">{shadowInnerDesat.toFixed(2)}</span></div><Slider type="single" value={shadowInnerDesat} onValueChange={(v) => (shadowInnerDesat = v as number)} min={0} max={1} step={0.02} /></div>
-								<div class="space-y-2"><div class="flex items-center justify-between text-sm text-muted-foreground"><span>黑底图混合权重</span><span class="font-mono text-foreground">{shadowInnerWeight.toFixed(2)}</span></div><Slider type="single" value={shadowInnerWeight} onValueChange={(v) => (shadowInnerWeight = v as number)} min={0} max={1} step={0.02} /></div>
+								<div class="space-y-2"><div class="flex items-center justify-between text-sm text-muted-foreground"><span>黑底图缩放</span><span class="font-mono text-foreground">{shadowInnerScale.toFixed(2)}</span></div><Slider type="single" value={shadowInnerScale} onValueChange={(v: number) => (shadowInnerScale = v as number)} min={0} max={1} step={0.02} /></div>
+								<div class="space-y-2"><div class="flex items-center justify-between text-sm text-muted-foreground"><span>黑底图去色</span><span class="font-mono text-foreground">{shadowInnerDesat.toFixed(2)}</span></div><Slider type="single" value={shadowInnerDesat} onValueChange={(v: number) => (shadowInnerDesat = v as number)} min={0} max={1} step={0.02} /></div>
+								<div class="space-y-2"><div class="flex items-center justify-between text-sm text-muted-foreground"><span>黑底图混合权重</span><span class="font-mono text-foreground">{shadowInnerWeight.toFixed(2)}</span></div><Slider type="single" value={shadowInnerWeight} onValueChange={(v: number) => (shadowInnerWeight = v as number)} min={0} max={1} step={0.02} /></div>
 							</div>
 							<div class="space-y-4 rounded-lg border bg-muted/30 p-4">
-								<div class="space-y-2"><div class="flex items-center justify-between text-sm text-muted-foreground"><span>白底图缩放</span><span class="font-mono text-foreground">{shadowCoverScale.toFixed(2)}</span></div><Slider type="single" value={shadowCoverScale} onValueChange={(v) => (shadowCoverScale = v as number)} min={0} max={1} step={0.02} /></div>
-								<div class="space-y-2"><div class="flex items-center justify-between text-sm text-muted-foreground"><span>白底图去色</span><span class="font-mono text-foreground">{shadowCoverDesat.toFixed(2)}</span></div><Slider type="single" value={shadowCoverDesat} onValueChange={(v) => (shadowCoverDesat = v as number)} min={0} max={1} step={0.02} /></div>
-								<div class="space-y-2"><div class="flex items-center justify-between text-sm text-muted-foreground"><span>最大尺寸</span><span class="font-mono text-foreground">{shadowMaxSize}</span></div><Slider type="single" value={shadowMaxSize} onValueChange={(v) => (shadowMaxSize = v as number)} min={0} max={4000} step={1} /></div>
+								<div class="space-y-2"><div class="flex items-center justify-between text-sm text-muted-foreground"><span>白底图缩放</span><span class="font-mono text-foreground">{shadowCoverScale.toFixed(2)}</span></div><Slider type="single" value={shadowCoverScale} onValueChange={(v: number) => (shadowCoverScale = v as number)} min={0} max={1} step={0.02} /></div>
+								<div class="space-y-2"><div class="flex items-center justify-between text-sm text-muted-foreground"><span>白底图去色</span><span class="font-mono text-foreground">{shadowCoverDesat.toFixed(2)}</span></div><Slider type="single" value={shadowCoverDesat} onValueChange={(v: number) => (shadowCoverDesat = v as number)} min={0} max={1} step={0.02} /></div>
+								<div class="space-y-2"><div class="flex items-center justify-between text-sm text-muted-foreground"><span>最大尺寸</span><span class="font-mono text-foreground">{shadowMaxSize}</span></div><Slider type="single" value={shadowMaxSize} onValueChange={(v: number) => (shadowMaxSize = v as number)} min={0} max={4000} step={1} /></div>
 							</div>
 						</div>
 					{/if}

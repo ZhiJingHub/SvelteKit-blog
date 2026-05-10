@@ -20,8 +20,13 @@
 </script>
 
 <script lang="ts">
-	import type { HTMLAnchorAttributes } from "svelte/elements";
-	import { cn, type WithElementRef } from "$lib/utils.ts";
+	import type { HTMLAttributes } from "svelte/elements";
+	import { cn, type WithElementRef } from "$lib/utils";
+
+	type Props = WithElementRef<HTMLAttributes<HTMLElement>> & {
+		href?: string;
+		variant?: BadgeVariant;
+	};
 
 	let {
 		ref = $bindable(null),
@@ -30,14 +35,11 @@
 		class: className,
 		children,
 		...restProps
-	}: WithElementRef<HTMLAnchorAttributes> & {
-		href?: string;
-		variant?: BadgeVariant;
-	} = $props();
+	}: Props = $props();
 </script>
 
 {#if href}
-	<a bind:this={ref} href data-slot="badge" class={cn(badgeVariants({ variant }), className)} {...restProps}>
+	<a bind:this={ref} href={href} data-slot="badge" class={cn(badgeVariants({ variant }), className)} {...restProps}>
 		{@render children?.()}
 	</a>
 {:else}

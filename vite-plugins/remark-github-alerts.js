@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { ALERT_REGEX, buildAlertTitleHtml } from './github-alerts-shared.js';
 
 function visit(node, type, fn) {

@@ -45,7 +45,7 @@
 	<CardContent class="space-y-4">
 		<div class="space-y-2"><Label>左侧文字</Label><Input bind:value={leftText} /></div>
 		<div class="space-y-2"><Label>右侧文字</Label><Input bind:value={rightText} /></div>
-		<div class="space-y-2"><Label>字体粗细: {fontWeight}</Label><Slider value={[fontWeight]} onValueChange={(v) => (fontWeight = v[0])} min={100} max={900} step={100} /></div>
+		<div class="space-y-2"><Label>字体粗细: {fontWeight}</Label><Slider value={[fontWeight]} onValueChange={(v: number[]) => (fontWeight = v[0])} min={100} max={900} step={100} /></div>
 		<div class="pt-4 border-t space-y-4">
 			<Label>自定义字体</Label>
 			<div>

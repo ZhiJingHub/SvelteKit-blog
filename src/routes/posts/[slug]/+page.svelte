@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { tick } from 'svelte';
+	import type { Component } from 'svelte';
 	import { page } from '$app/stores';
 	import { Button } from '$lib/components/ui/button';
 	import { Badge } from '$lib/components/ui/badge';
@@ -13,6 +14,8 @@
 	let { data }: { data: PageData } = $props();
 
 	let proseEl: HTMLDivElement | undefined = $state();
+
+	let PostContent = $derived(data.component as Component);
 
 	function formatDate(dateString: string) {
 		const date = new Date(dateString);
@@ -97,7 +100,7 @@
 	}
 
 	$effect(() => {
-		void data.component;
+		void PostContent;
 		void $page.url;
 		(async () => {
 			await tick();
@@ -192,10 +195,10 @@
 			prose-td:border prose-td:border-border
 			prose-img:rounded-lg"
 	>
-		<data.component />
+		<PostContent />
 	</div>
 
-	<PostToc container={proseEl} trigger={data.component} />
+	<PostToc container={proseEl} trigger={PostContent} />
 
 	<footer class="mt-12 border-t pt-8">
 		<div class="flex justify-center">

@@ -1,3 +1,4 @@
+// @ts-nocheck
 const CONVERTIBLE_RE = /\.(png|jpe?g|webp)(?=$|[?#])/i;
 
 function rewriteUrl(url) {

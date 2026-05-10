@@ -1,3 +1,4 @@
+// @ts-nocheck
 export const ALERT_TYPES = ['note', 'tip', 'info', 'important', 'warning', 'caution'];
 
 export const ALERT_LABELS = {

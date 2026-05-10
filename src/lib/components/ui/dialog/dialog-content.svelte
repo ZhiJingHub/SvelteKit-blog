@@ -2,9 +2,9 @@
 	import Icon from '@iconify/svelte';
 	import { Dialog as DialogPrimitive } from "bits-ui";
 	import DialogPortal from "./dialog-portal.svelte";
-	import * as Dialog from "./index.ts";
-	import { cn, type WithoutChildrenOrChild } from "$lib/utils.ts";
-	import { Button } from "$lib/components/ui/button/index.ts";
+	import * as Dialog from "./index";
+	import { cn, type WithoutChildrenOrChild } from "$lib/utils";
+	import { Button } from "$lib/components/ui/button";
 	let {
 		ref = $bindable(null),
 		class: className,

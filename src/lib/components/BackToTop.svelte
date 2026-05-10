@@ -3,12 +3,12 @@
 	import Icon from '@iconify/svelte';
 	import { tocFloating } from '$lib/stores/toc-floating';
 
+	const tocAvailable = tocFloating.available;
+
 	let scrollY = $state(0);
 	let showButton = $derived(scrollY > 100);
 
-	let showTocButton = $state(false);
 	let isTocOpen = $state(false);
-	$effect(() => { showTocButton = $tocFloating.available; });
 	$effect(() => { isTocOpen = $tocFloating; });
 
 	const scrollToTop = () => {
@@ -19,7 +19,7 @@
 <svelte:window bind:scrollY />
 
 <div class="fixed bottom-6 right-6 z-50 flex flex-col gap-3">
-	{#if showTocButton}
+	{#if $tocAvailable}
 		<div transition:fly={{ y: 20, duration: 300 }} class="xl:hidden">
 			<button
 				onclick={() => tocFloating.toggle()}

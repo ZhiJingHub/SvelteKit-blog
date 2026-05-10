@@ -8,7 +8,7 @@
 		iconBgEnabled, iconBgColor, iconBgOpacity, iconBgBlur, iconBgRadius, useOriginalIconColor,
 		iconColor, iconShadow, iconRadius, isDragging, hexToRgba, onPointerDown, onPointerMove, onPointerUp, onWheel
 	}: {
-		svgContainer: SVGSVGElement; canvasWidth: number; canvasHeight: number; visualRatios: Ratio[];
+		svgContainer: SVGSVGElement | undefined; canvasWidth: number; canvasHeight: number; visualRatios: Ratio[];
 		bgImage: string | null; bgImageX: number; bgImageY: number; bgImageScale: number; bgBlur: number; bgOpacity: number;
 		bgColor: string; bgColorOpacity: number; leftText: string; rightText: string; fontSize: number; fontWeight: number;
 		customFontName: string; color: string; textShadow: { x: number; y: number; blur: number; color: string; alpha: number };

@@ -1,3 +1,4 @@
+// @ts-nocheck
 function visit(node, type, fn) {
 	if (!node || typeof node !== 'object') return;
 	if (Array.isArray(node)) {

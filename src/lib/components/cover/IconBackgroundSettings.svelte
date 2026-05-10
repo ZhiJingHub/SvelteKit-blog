@@ -30,10 +30,10 @@
 					</div>
 				</div>
 				<div class="grid grid-cols-2 gap-4">
-					<div class="space-y-2"><Label>内边距: {iconBgPadding}px</Label><Slider value={[iconBgPadding]} onValueChange={(v) => (iconBgPadding = v[0])} min={0} max={100} /></div>
-					<div class="space-y-2"><Label>圆角: {iconBgRadius}%</Label><Slider value={[iconBgRadius]} onValueChange={(v) => (iconBgRadius = v[0])} min={0} max={50} /></div>
-					<div class="space-y-2"><Label>模糊: {iconBgBlur}px</Label><Slider value={[iconBgBlur]} onValueChange={(v) => (iconBgBlur = v[0])} min={0} max={20} /></div>
-					<div class="space-y-2"><Label>不透明度: {Math.round(iconBgOpacity * 100)}%</Label><Slider value={[iconBgOpacity]} onValueChange={(v) => (iconBgOpacity = v[0])} min={0} max={1} step={0.01} /></div>
+					<div class="space-y-2"><Label>内边距: {iconBgPadding}px</Label><Slider value={[iconBgPadding]} onValueChange={(v: number[]) => (iconBgPadding = v[0])} min={0} max={100} /></div>
+					<div class="space-y-2"><Label>圆角: {iconBgRadius}%</Label><Slider value={[iconBgRadius]} onValueChange={(v: number[]) => (iconBgRadius = v[0])} min={0} max={50} /></div>
+					<div class="space-y-2"><Label>模糊: {iconBgBlur}px</Label><Slider value={[iconBgBlur]} onValueChange={(v: number[]) => (iconBgBlur = v[0])} min={0} max={20} /></div>
+					<div class="space-y-2"><Label>不透明度: {Math.round(iconBgOpacity * 100)}%</Label><Slider value={[iconBgOpacity]} onValueChange={(v: number[]) => (iconBgOpacity = v[0])} min={0} max={1} step={0.01} /></div>
 				</div>
 			</div>
 		{/if}

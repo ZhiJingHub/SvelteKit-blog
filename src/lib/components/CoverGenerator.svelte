@@ -63,7 +63,7 @@
 
 	let exportConfig = $state({ format: 'png' as 'png' | 'svg', scales: [1] as number[], filename: 'cover', transparentBg: false, exportRatios: [] as string[] });
 
-	let svgContainer: SVGSVGElement;
+	let svgContainer: SVGSVGElement | undefined = $state();
 	let dragStartX = 0; let dragStartY = 0; let initialImageX = 0; let initialImageY = 0;
 	let activePointers = new Map<number, { x: number; y: number }>();
 	let initialPinchDistance = 0; let initialScale = 1;

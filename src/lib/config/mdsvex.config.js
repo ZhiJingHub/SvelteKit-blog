@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { defineMDSveXConfig as defineConfig } from 'mdsvex';
 import remarkAvifRewrite from '../../../vite-plugins/remark-avif-rewrite.js';
 import remarkGithubAlerts from '../../../vite-plugins/remark-github-alerts.js';

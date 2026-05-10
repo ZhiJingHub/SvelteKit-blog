@@ -1,3 +1,4 @@
+// @ts-nocheck
 import katex from 'katex';
 
 function renderFormula(formula, displayMode) {

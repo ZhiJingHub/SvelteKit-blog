@@ -1,18 +1,25 @@
 <script lang="ts">
 	import { Slider as SliderPrimitive } from "bits-ui";
-	import { cn, type WithoutChildrenOrChild } from "$lib/utils.ts";
+	import { cn } from "$lib/utils";
+	import type { ClassValue } from "clsx";
 
 	let {
 		ref = $bindable(null),
 		value = $bindable(),
 		class: className,
 		...restProps
-	}: WithoutChildrenOrChild<SliderPrimitive.RootProps> = $props();
+	}: {
+		ref?: HTMLSpanElement | null;
+		value?: number | number[];
+		class?: ClassValue;
+		[key: string]: unknown;
+	} = $props();
 </script>
 
 <SliderPrimitive.Root
 	bind:ref
 	bind:value={value as never}
+	type="single"
 	data-slot="slider"
 	class={cn(
 		"relative flex w-full touch-none items-center select-none data-disabled:opacity-50",

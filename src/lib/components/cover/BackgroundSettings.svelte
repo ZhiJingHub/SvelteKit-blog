@@ -32,9 +32,9 @@
 					<Label>模糊: {bgBlur}px</Label>
 					<Button variant="destructive" size="sm" onclick={() => (bgImage = null)}><Icon icon="mdi:delete" class="h-4 w-4" /></Button>
 				</div>
-				<Slider value={[bgBlur]} onValueChange={(v) => (bgBlur = v[0])} min={0} max={20} />
+				<Slider value={[bgBlur]} onValueChange={(v: number[]) => (bgBlur = v[0])} min={0} max={20} />
 				<Label>不透明度: {Math.round(bgOpacity * 100)}%</Label>
-				<Slider value={[bgOpacity]} onValueChange={(v) => (bgOpacity = v[0])} min={0} max={1} step={0.01} />
+				<Slider value={[bgOpacity]} onValueChange={(v: number[]) => (bgOpacity = v[0])} min={0} max={1} step={0.01} />
 				<p class="text-xs text-muted-foreground">提示: 拖拽移动位置，滚轮缩放大小</p>
 			</div>
 		{/if}
