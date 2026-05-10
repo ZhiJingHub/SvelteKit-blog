@@ -11,7 +11,10 @@
 		});
 	}
 
-	let currentMode = $derived($themeMode);
+	let currentMode = $state<ThemeMode>('system');
+	$effect(() => {
+		currentMode = $themeMode;
+	});
 
 	let icon = $derived(
 		currentMode === 'light' ? 'mdi:weather-sunny' :

@@ -17,7 +17,8 @@
 	let activeId = $state<string>('');
 	let observer: IntersectionObserver | undefined;
 
-	const mobileOpen = $derived($tocFloating);
+	let mobileOpen = $state(false);
+	$effect(() => { mobileOpen = $tocFloating; });
 
 	let minLevel = $derived(headings.length ? Math.min(...headings.map((h) => h.level)) : 1);
 

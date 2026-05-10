@@ -5,8 +5,11 @@
 
 	let scrollY = $state(0);
 	let showButton = $derived(scrollY > 100);
-	let showTocButton = $derived($tocFloating.available);
-	let isTocOpen = $derived($tocFloating);
+
+	let showTocButton = $state(false);
+	let isTocOpen = $state(false);
+	$effect(() => { showTocButton = $tocFloating.available; });
+	$effect(() => { isTocOpen = $tocFloating; });
 
 	const scrollToTop = () => {
 		window.scrollTo({ top: 0, behavior: 'smooth' });
