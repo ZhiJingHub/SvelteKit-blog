@@ -27,3 +27,9 @@ Thumbs.db
 # Vite
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# Docs (local only)
+使用手册.md
+
+# Obsidian
+.obsidian/
