@@ -1,13 +1,26 @@
 <script lang="ts">
 	import '../app.css';
 	import { page } from '$app/stores';
+	import { onNavigate } from '$app/navigation';
 	import { siteConfig } from '$lib/config/site';
 	import BackToTop from '$lib/components/BackToTop.svelte';
 	import NavBar from '$lib/components/NavBar.svelte';
+	import Footer from '$lib/components/Footer.svelte';
 
 	let { children } = $props();
 
 	let isPostDetail = $derived(/^\/posts\/[^/]+\/?$/.test($page.url.pathname));
+
+	onNavigate((navigation) => {
+		if (!document.startViewTransition) return;
+
+		return new Promise((resolve) => {
+			document.startViewTransition(async () => {
+				resolve();
+				await navigation.complete;
+			});
+		});
+	});
 </script>
 
 <svelte:head>
@@ -35,5 +48,7 @@
 <NavBar />
 
 {@render children()}
+
+<Footer />
 
 <BackToTop />

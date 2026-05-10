@@ -22,7 +22,7 @@
 				onclick={() => tocFloating.toggle()}
 				aria-label="目录"
 				aria-expanded={isTocOpen}
-				class="inline-flex items-center justify-center rounded-md w-12 h-12 shadow-lg hover:shadow-xl bg-card border border-border hover:bg-accent transition-colors"
+				class="inline-flex items-center justify-center rounded-md w-12 h-12 shadow-lg hover:shadow-xl bg-white text-black dark:bg-black dark:text-white border-2 border-border transition-colors"
 			>
 				<Icon
 					icon={isTocOpen ? 'mdi:close' : 'mdi:format-list-bulleted'}
@@ -37,7 +37,7 @@
 			<button
 				onclick={scrollToTop}
 				aria-label="回到顶部"
-				class="inline-flex items-center justify-center rounded-md w-12 h-12 shadow-lg hover:shadow-xl bg-card border border-border hover:bg-accent transition-colors"
+				class="inline-flex items-center justify-center rounded-md w-12 h-12 shadow-lg hover:shadow-xl bg-white text-black dark:bg-black dark:text-white border-2 border-border transition-colors"
 			>
 				<Icon icon="mdi:chevron-up" class="w-5 h-5" />
 			</button>
