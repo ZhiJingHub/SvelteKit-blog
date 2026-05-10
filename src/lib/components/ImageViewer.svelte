@@ -10,7 +10,7 @@
 			pswpModule: () => import('photoswipe')
 		});
 
-		lightbox.addFilter('itemData', (itemData, index) => {
+		lightbox.addFilter('itemData', (itemData) => {
 			const img = itemData.element as HTMLImageElement;
 			return {
 				src: img.src,
@@ -21,10 +21,9 @@
 		});
 
 		lightbox.on('uiRegister', () => {
-			const images = document.querySelectorAll('.prose img');
-			images.forEach((img) => {
-				(img as HTMLElement).style.cursor = 'pointer';
-			});
+			for (const img of document.querySelectorAll('.prose img')) {
+				(img as HTMLElement).style.cursor = 'zoom-in';
+			}
 		});
 
 		lightbox.init();

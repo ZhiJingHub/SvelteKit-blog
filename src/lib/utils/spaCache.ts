@@ -25,12 +25,17 @@ class SPACache {
 		this.cache.delete(key);
 	}
 
-	clearAll(): void {
-		this.cache.clear();
-	}
-
 	has(key: string): boolean {
 		return this.cache.has(key);
+	}
+
+	peek<T>(key: string): T | undefined {
+		const cached = this.cache.get(key);
+		return cached?.data as T | undefined;
+	}
+
+	clearAll(): void {
+		this.cache.clear();
 	}
 }
 
