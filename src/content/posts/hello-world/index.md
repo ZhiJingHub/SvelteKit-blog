@@ -1,487 +1,627 @@
 ---
-title: "Svelte + mdsvex 全功能测试文章"
-description: "用于测试 Vite + Svelte + mdsvex 博客系统的完整 Markdown / Svelte / 代码高亮 / Mermaid / 数学公式 / 组件渲染能力。"
-published: "2026-05-10"
-updated: "2026-05-10"
+title: "Ultimate mdsvex + Svelte + Vite Markdown Pipeline Test"
+description: "A complete rendering and pipeline stress test for mdsvex, Shiki, rehype, remark, KaTeX, code highlighting, containers, embeds and custom components."
+published: 2026-05-10
+updated: 2026-05-10
 tags:
-  - Svelte
   - mdsvex
-  - Vite
-  - Markdown
-  - 测试
-cover: "/images/test-cover.webp"
+  - svelte
+  - vite
+  - markdown
+  - testing
+  - pipeline
+  - syntax-highlighting
+  - katex
+  - shiki
+category: "Testing"
 draft: false
+featured: true
+cover: "/images/demo/cover.webp"
 toc: true
+lang: "zh-CN"
 ---
 
-<script lang="ts">
+<script>
   let count = 0;
 
-  const cards = [
-    {
-      title: "Svelte",
-      desc: "Reactive UI Framework"
-    },
-    {
-      title: "Vite",
-      desc: "Next Generation Frontend Tooling"
-    },
-    {
-      title: "mdsvex",
-      desc: "Markdown powered Svelte"
-    }
+  const features = [
+    "Markdown",
+    "mdsvex",
+    "Svelte",
+    "Vite",
+    "KaTeX",
+    "Shiki",
+    "Remark",
+    "Rehype"
   ];
+
+  function increase() {
+    count += 1;
+  }
 </script>
 
-# Svelte + mdsvex 全功能测试
+# Ultimate mdsvex Pipeline Test
 
-这是一篇专门用于测试：
-
-- `Vite`
-- `Svelte`
-- `SvelteKit`
-- `mdsvex`
-
-博客系统功能的综合测试文章。
-
-适用于：
-
-- SSG
-- SSR
-- Cloudflare Workers
-- Netlify
-- Vercel
-
----
-
-# 标题测试
-
-# 一级标题
-
-## 二级标题
-
-### 三级标题
-
-#### 四级标题
-
-##### 五级标题
-
-###### 六级标题
+> 这是一篇专门用于测试现代 SSG / mdsvex Markdown Pipeline 的完整文档。  
+> 它覆盖了：
+>
+> - Markdown 基础语法
+> - GitHub Flavored Markdown
+> - mdsvex 组件能力
+> - Svelte 响应式能力
+> - KaTeX 数学公式
+> - Shiki / Prism 代码高亮
+> - rehype / remark 插件兼容
+> - 图片、表格、任务列表
+> - 容器、警告框、引用块
+> - HTML 混排
+> - Emoji / Footnote / TOC
+> - 自定义组件测试
+> - 暗黑模式兼容
+> - 长文性能压力测试
 
 ---
 
-# 文本样式测试
+## 目录测试
 
-普通文本
+[[toc]]
+
+---
+
+# 1. Markdown 基础测试
+
+## 标题层级
+
+# H1
+## H2
+### H3
+#### H4
+##### H5
+###### H6
+
+---
+
+## 文本样式
 
 **粗体文本**
 
 *斜体文本*
 
-***粗斜体***
+***粗斜体文本***
 
 ~~删除线~~
 
-`行内代码`
-
 ==高亮文本==
 
-> 引用文本
+<u>下划线</u>
 
->> 嵌套引用
+`Inline Code`
 
 ---
 
-# 列表测试
+## 引用块
+
+> 普通引用
+>
+> > 嵌套引用
+> >
+> > > 三层嵌套
+
+---
+
+## 分隔线
+
+---
+
+***
+
+___
+
+---
+
+# 2. 列表测试
 
 ## 无序列表
 
 - Apple
 - Banana
-- Orange
+  - Orange
+  - Peach
+    - Watermelon
 
 ## 有序列表
 
-1. 安装 Node.js
-2. 安装 pnpm
-3. 创建项目
-4. 部署站点
+1. First
+2. Second
+3. Third
 
 ## 任务列表
 
-- [x] Markdown
-- [x] Svelte
 - [x] mdsvex
-- [ ] PWA
-- [ ] RSS
+- [x] Svelte
+- [x] Vite
+- [ ] Astro
+- [ ] UnoCSS
 
 ---
 
-# 表格测试
+# 3. 表格测试
 
-| 名称 | 类型 | 描述 |
-| --- | --- | --- |
-| Svelte | Framework | 前端框架 |
-| mdsvex | Markdown | Markdown 预处理器 |
-| Vite | Build Tool | 构建工具 |
+| Framework | Language | Build Tool | SSR |
+| ---------- | -------- | ---------- | --- |
+| SvelteKit | TS/JS | Vite | ✅ |
+| Astro | TS/JS | Vite | ✅ |
+| Next.js | TS/JS | Turbopack | ✅ |
+| Nuxt | TS/JS | Vite/Webpack | ✅ |
 
 ---
 
-# 代码块测试
+# 4. 链接测试
+
+## 外部链接
+
+- https://svelte.dev
+- https://vitejs.dev
+- https://mdsvex.pngwn.io
+
+## Markdown Link
+
+[Svelte Official](https://svelte.dev)
+
+[Vite Official](https://vitejs.dev)
+
+[mdsvex Docs](https://mdsvex.pngwn.io)
+
+---
+
+# 5. 图片测试
+
+## 普通图片
+
+![Landscape](https://picsum.photos/1200/600)
+
+## 带标题图片
+
+![Mountains](https://picsum.photos/1000/500 "Random Demo Image")
+
+---
+
+# 6. Emoji 测试
+
+🚀 ✨ 🎉 🔥 💻 📦 ⚡ 🌙 🌈 🧠
+
+---
+
+# 7. 数学公式测试（KaTeX / MathJax）
+
+## 行内公式
+
+爱因斯坦质能方程：
+
+$E = mc^2$
+
+## 块级公式
+
+$$
+\frac{d}{dx}e^x = e^x
+$$
+
+$$
+\int_{-\infty}^{+\infty} e^{-x^2}dx = \sqrt{\pi}
+$$
+
+## 矩阵公式
+
+$$
+\begin{bmatrix}
+1 & 2 & 3 \\
+4 & 5 & 6 \\
+7 & 8 & 9
+\end{bmatrix}
+$$
+
+## Mermaid 兼容性说明
+
+如果你启用了 remark-mermaid：
+
+```mermaid
+graph TD
+    A[Vite] --> B[mdsvex]
+    B --> C[Svelte]
+    C --> D[Build]
+```
+
+---
+
+# 8. 代码高亮测试
 
 ## JavaScript
 
 ```js
-const hello = "world";
+export async function load({ fetch }) {
+  const res = await fetch('/api/posts');
 
-function greet(name) {
-  console.log(`Hello ${name}`);
+  if (!res.ok) {
+    throw new Error('Failed to fetch posts');
+  }
+
+  return {
+    posts: await res.json()
+  };
 }
-
-greet("Svelte");
 ```
 
 ## TypeScript
 
 ```ts
 interface User {
+  id: number;
   name: string;
-  age: number;
+  role?: string;
 }
 
 const user: User = {
-  name: "Svelte",
-  age: 5
+  id: 1,
+  name: "mdsvex"
 };
+
+console.log(user);
 ```
 
 ## Svelte
 
 ```svelte
-<script>
+<script lang="ts">
   let count = 0;
+
+  function increment() {
+    count += 1;
+  }
 </script>
 
-<button on:click={() => count++}>
-  count: {count}
+<button on:click={increment}>
+  Count: {count}
 </button>
 ```
 
-## Bash
+## Rust
+
+```rust
+fn main() {
+    println!("Hello, mdsvex!");
+}
+```
+
+## Go
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+    fmt.Println("Hello World")
+}
+```
+
+## Python
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class User:
+    name: str
+    age: int
+
+print(User("Svelte", 10))
+```
+
+## Shell
 
 ```bash
-pnpm create svelte@latest
 pnpm install
 pnpm dev
+pnpm build
+pnpm preview
+```
+
+## JSON
+
+```json
+{
+  "name": "ultimate-mdsvex-test",
+  "type": "module",
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build"
+  }
+}
 ```
 
 ---
 
-# 数学公式测试
+# 9. Diff 高亮测试
 
-行内公式：
+```diff
+- const framework = "React";
++ const framework = "Svelte";
 
-$E = mc^2$
-
-块级公式：
-
-$$
-\frac{d}{dx}e^x = e^x
-$$
-
-矩阵：
-
-$$
-\begin{bmatrix}
-1 & 2 \\
-3 & 4
-\end{bmatrix}
-$$
-
----
-
-# Mermaid 测试
-
-```mermaid
-graph TD
-  A[Svelte] --> B[mdsvex]
-  B --> C[Vite]
-  C --> D[Cloudflare]
+- npm install
++ pnpm install
 ```
 
 ---
 
-# 图片测试
+# 10. HTML 混排测试
 
-![Random Image](https://picsum.photos/1200/600)
-
----
-
-# HTML 测试
-
-<div class="custom-box">
+<div style="padding: 1rem; border: 1px solid #888; border-radius: 12px;">
   <h3>HTML Block</h3>
-  <p>测试 HTML 是否正常渲染。</p>
+  <p>这是原生 HTML 内容。</p>
 </div>
 
-<style>
-  .custom-box {
-    padding: 20px;
-    border-radius: 16px;
-    background: rgba(255,255,255,.05);
-    border: 1px solid rgba(255,255,255,.1);
-    margin: 20px 0;
-  }
+---
 
-  .custom-box h3 {
-    margin-top: 0;
-  }
-</style>
+# 11. mdsvex + Svelte 测试
+
+## 响应式变量
+
+当前点击次数：
+
+**{count}**
+
+<button on:click={increase}>
+  点击增加
+</button>
 
 ---
 
-# Svelte 响应式测试
+## #each 渲染测试
 
-<button on:click={() => count++}>
-  点击次数：{count}
-</button>
+<ul>
+  {#each features as item}
+    <li>{item}</li>
+  {/each}
+</ul>
+
+---
+
+## 条件渲染
 
 {#if count > 5}
-  <p>🎉 你已经点击超过 5 次了！</p>
+  <p>🔥 已超过 5 次点击</p>
+{:else}
+  <p>📦 点击次数不足 5 次</p>
 {/if}
 
 ---
 
-# #each 测试
+# 12. Admonition / Container 测试
 
-<div class="grid">
-  {#each cards as card}
-    <div class="card">
-      <h3>{card.title}</h3>
-      <p>{card.desc}</p>
-    </div>
-  {/each}
-</div>
+:::note
+这是一个 Note 容器。
+:::
 
-<style>
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
-    gap: 16px;
-    margin: 20px 0;
-  }
+:::tip
+这是一个 Tip 容器。
+:::
 
-  .card {
-    padding: 20px;
-    border-radius: 16px;
-    background: rgba(255,255,255,.04);
-    border: 1px solid rgba(255,255,255,.08);
-    transition: .3s;
-  }
+:::warning
+这是一个 Warning 容器。
+:::
 
-  .card:hover {
-    transform: translateY(-4px);
-  }
-</style>
+:::danger
+这是一个 Danger 容器。
+:::
 
 ---
 
-# 代码高亮测试
+# 13. Footnote 测试
+
+这是一个脚注测试。[^1]
+
+[^1]: 这是脚注内容。
+
+---
+
+# 14. 引用测试
+
+> “Simplicity is the soul of efficiency.”
+>
+> — Austin Freeman
+
+---
+
+# 15. 键盘按键测试
+
+Press <kbd>Ctrl</kbd> + <kbd>S</kbd> to save.
+
+---
+
+# 16. 长内容压力测试
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+
+---
+
+# 17. 深色模式测试
+
+```css
+:root {
+  --background: #ffffff;
+  --foreground: #111111;
+}
+
+.dark {
+  --background: #0f172a;
+  --foreground: #f8fafc;
+}
+```
+
+---
+
+# 18. rehype-slug 测试
+
+## heading-id-test
+
+跳转链接：
+
+[跳转到 Heading](#heading-id-test)
+
+---
+
+# 19. GFM 自动链接
+
+https://github.com
+
+https://npmjs.com
+
+https://pnpm.io
+
+---
+
+# 20. 转义字符测试
+
+\*not italic\*
+
+\`not code\`
+
+\# not heading
+
+---
+
+# 21. YAML Frontmatter 测试
+
+当前文档顶部包含：
+
+- title
+- description
+- tags
+- toc
+- category
+- cover
+- featured
+- lang
+
+用于测试：
+
+- gray-matter
+- frontmatter parser
+- rss
+- sitemap
+- seo plugin
+
+---
+
+# 22. SEO Meta 测试
+
+建议测试：
+
+- OpenGraph
+- Twitter Card
+- canonical
+- robots
+- JSON-LD
+
+---
+
+# 23. 构建性能测试
+
+建议测试：
+
+- Vite HMR
+- mdsvex compile speed
+- hydration
+- static prerender
+- code splitting
+- dynamic import
+
+---
+
+# 24. 推荐 Pipeline 配置
 
 ```ts
-type Theme = "dark" | "light";
+import { mdsvex } from 'mdsvex';
+import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import rehypeSlug from 'rehype-slug';
+import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 
-const theme: Theme = "dark";
+export default {
+  extensions: ['.svelte', '.svx'],
+  preprocess: [
+    mdsvex({
+      extensions: ['.svx', '.md'],
+      remarkPlugins: [
+        remarkGfm,
+        remarkMath
+      ],
+      rehypePlugins: [
+        rehypeKatex,
+        rehypeSlug,
+        rehypeAutolinkHeadings
+      ]
+    })
+  ]
+};
 ```
 
 ---
 
-# 文件树测试
+# 25. 最终测试结论
 
-```txt
-src/
-├── lib/
-├── routes/
-├── components/
-├── content/
-├── app.html
-└── hooks.server.ts
-```
+如果以下内容均正常工作：
 
----
-
-# Alert 测试
-
-> [!NOTE]
-> 这是一个 Note 提示框。
-
-> [!TIP]
-> 这是一个 Tip 提示框。
-
-> [!WARNING]
-> 这是一个 Warning 提示框。
-
----
-
-# 折叠块测试
-
-<details>
-<summary>点击展开</summary>
-
-这里是折叠内容。
-
-```js
-console.log("Hello mdsvex");
-```
-
-</details>
-
----
-
-# Emoji 测试
-
-🚀 ✨ 🔥 ❤️ 🎉 🌙 ☁️
-
----
-
-# iframe 测试
-
-<iframe
-  width="100%"
-  height="500"
-  src="https://www.youtube.com/embed/dQw4w9WgXcQ"
-  title="YouTube"
-  frameborder="0"
-  allowfullscreen>
-</iframe>
-
----
-
-# 音频测试
-
-<audio controls>
-  <source src="/audio/demo.mp3" type="audio/mpeg">
-</audio>
-
----
-
-# 响应式布局测试
-
-<div class="responsive-grid">
-  <div>Card 1</div>
-  <div>Card 2</div>
-  <div>Card 3</div>
-</div>
-
-<style>
-  .responsive-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit,minmax(180px,1fr));
-    gap: 16px;
-    margin: 24px 0;
-  }
-
-  .responsive-grid div {
-    padding: 24px;
-    border-radius: 14px;
-    background: rgba(255,255,255,.05);
-    text-align: center;
-  }
-</style>
-
----
-
-# SEO Frontmatter 测试
-
-```yaml
----
-title: Hello World
-description: SEO Description
-keywords:
-  - svelte
-  - mdsvex
-  - vite
-cover: /cover.webp
-draft: false
----
-```
-
----
-
-# 长文本测试
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-
----
-
-# GitHub Flavored Markdown
-
-| 功能 | 状态 |
-| --- | --- |
-| Table | ✅ |
-| Task List | ✅ |
-| Code Highlight | ✅ |
-| Mermaid | ✅ |
-| KaTeX | ✅ |
-
----
-
-# Cloudflare 部署测试
-
-```bash
-pnpm build
-
-wrangler deploy
-```
-
----
-
-# mdsvex Component 测试
-
-<svelte:component this={"div"}>
-  mdsvex Dynamic Component
-</svelte:component>
-
----
-
-# 最终测试
-
-如果你能正常看到：
-
-- Svelte 响应式组件
-- 代码高亮
-- 数学公式
-- Mermaid
-- HTML
-- CSS
-- 视频
-- 表格
-- 提示框
+- [x] 数学公式
+- [x] 代码高亮
+- [x] Mermaid
+- [x] GFM
+- [x] Svelte 响应式
+- [x] Frontmatter
+- [x] 图片
+- [x] HTML
+- [x] Admonition
+- [x] TOC
+- [x] Footnote
+- [x] rehype-slug
+- [x] remark-gfm
+- [x] 暗黑模式
+- [x] SSR
+- [x] Hydration
 
 那么你的：
 
-✅ mdsvex  
-✅ Vite  
-✅ Svelte  
-✅ Markdown Pipeline  
+- mdsvex
+- Svelte
+- Vite
+- Markdown Pipeline
 
-已经基本配置成功。
+已经属于现代化高规格博客方案。
 
 ---
 
-# 结束语
+# END
 
-愿你的博客：
-
-- Lighthouse 100
-- SEO 拉满
-- Cloudflare 全球缓存
-- 页面秒开
-- 动画丝滑
-- GitHub Actions 永不报错
-
-🚀
+> Generated for:
+>
+> - mdsvex
+> - Svelte
+> - Vite
+> - Markdown Pipeline
+> - Modern SSG
+> - Cloudflare / Vercel / Netlify Compatible
+>
+> 🚀
