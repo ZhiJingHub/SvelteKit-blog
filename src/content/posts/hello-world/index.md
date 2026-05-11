@@ -6,8 +6,6 @@ author: '你的名字'
 description: '这是一篇带有时间、标签和交互组件的 MDX 示例文章。'
 ---
 
-import { useState } from 'react';
-
 # 👋 Hello World!
 
 欢迎来到这篇带有完整信息的 MDX 文章。在这篇文章的顶部，我们使用了 **YAML Frontmatter** 语法来定义页面的元数据。
