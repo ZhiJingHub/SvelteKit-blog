@@ -1,0 +1,212 @@
+name: 友链自动审核
+
+on:
+  issues:
+    types: [opened, edited]
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: read
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    if: contains(github.event.issue.labels.*.name, '友链申请')
+
+    steps:
+      - name: 拉取仓库
+        uses: actions/checkout@v4
+
+      - name: 解析 Issue 表单
+        id: parse
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = context.payload.issue.body || '';
+
+            function extract(section, id) {
+              const re = new RegExp(`###\\s+${section}\\s+\\n\\n(.+?)(?=\\n###|\\n---|$)`, 's');
+              const match = body.match(re);
+              return match ? match[1].trim() : '';
+            }
+
+            const raw = {};
+            raw.name = extract('站点名称', 'name');
+            raw.url = extract('站点地址', 'url');
+            raw.avatar = extract('头像地址', 'avatar') || null;
+            raw.description = extract('站点描述', 'description');
+
+            if (raw.avatar === '_No response_' || raw.avatar === '') raw.avatar = null;
+
+            core.startGroup('解析结果');
+            for (const [k, v] of Object.entries(raw)) {
+              core.info(`${k}: ${v}`);
+            }
+            core.endGroup();
+
+            /* 验证必填字段 */
+            if (!raw.name || !raw.url || !raw.description) {
+              core.setFailed('信息不完整：站点名称、地址、描述为必填项');
+              return;
+            }
+
+            /* 验证 URL 格式 */
+            try {
+              const u = new URL(raw.url);
+              if (!['http:', 'https:'].includes(u.protocol)) throw new Error('invalid');
+            } catch {
+              core.setFailed(`无效的站点地址: ${raw.url}`);
+              return;
+            }
+
+            /* 恶意内容检测 */
+            const spamPatterns = [
+              /博彩/i, /赌博/i, /彩票/i, /赌场/i, /六合彩/i,
+              /色情/i, /成人/i, /约炮/i, /一夜情/i,
+              /翻墙/i, /VPN翻墙/i, /破解/i, /盗版/i, /外挂/i,
+              /刷单/i, /网赚/i, /传销/i, /资金盘/i,
+              /代孕/i, /枪支/i, /毒品/i,
+              /localhost/i, /127\.0\.0\./
+            ];
+            const fullText = [raw.name, raw.url, raw.description].join(' ');
+            const hit = spamPatterns.find(r => r.test(fullText));
+            if (hit) {
+              core.setFailed(`检测到违规内容: ${hit.source}`);
+              return;
+            }
+
+            core.setOutput('name', raw.name);
+            core.setOutput('url', raw.url);
+            core.setOutput('avatar', raw.avatar || '');
+            core.setOutput('description', raw.description);
+
+      - name: 验证反链
+        id: backlink
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const applicantUrl = '${{ steps.parse.outputs.url }}';
+            const ourUrl = 'https://iwexe.top';
+
+            core.info(`检查 ${applicantUrl} 是否包含 ${ourUrl} 的反链...`);
+
+            let hasBacklink = false;
+            try {
+              const resp = await fetch(applicantUrl, {
+                signal: AbortSignal.timeout(15000),
+                headers: { 'User-Agent': 'FriendLinkBot/1.0 (GitHub Actions)' }
+              });
+              const html = await resp.text();
+
+              hasBacklink = html.includes('iwexe.top') || html.includes('iwexe.top');
+
+              if (!hasBacklink) {
+                const re = /href\s*=\s*["']https?:\/\/iwexe\.top["']/i;
+                hasBacklink = re.test(html);
+              }
+            } catch (e) {
+              core.warning(`无法访问申请站点: ${e.message}`);
+            }
+
+            core.setOutput('hasBacklink', hasBacklink.toString());
+            core.info(`反链检测结果: ${hasBacklink ? '✅ 已添加' : '❌ 未找到'}`);
+
+      - name: 创建友链 JSON 文件
+        id: create
+        run: |
+          NAME="${{ steps.parse.outputs.name }}"
+          URL="${{ steps.parse.outputs.url }}"
+          AVATAR="${{ steps.parse.outputs.avatar }}"
+          DESCRIPTION="${{ steps.parse.outputs.description }}"
+
+          SAFE_NAME=$(echo "$NAME" | sed 's/[^a-zA-Z0-9_\\u4e00-\\u9fa5-]/_/g')
+          FILE="src/routes/friends/${SAFE_NAME}.json"
+
+          if [ -f "$FILE" ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+            echo "file=$FILE" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          mkdir -p src/routes/friends
+
+          if [ -n "$AVATAR" ]; then
+            cat > "$FILE" <<EOF
+          {
+            "name": "${NAME}",
+            "avatar": "${AVATAR}",
+            "description": "${DESCRIPTION}",
+            "url": "${URL}"
+          }
+          EOF
+          else
+            cat > "$FILE" <<EOF
+          {
+            "name": "${NAME}",
+            "avatar": null,
+            "description": "${DESCRIPTION}",
+            "url": "${URL}"
+          }
+          EOF
+          fi
+
+          echo "exists=false" >> $GITHUB_OUTPUT
+          echo "file=$FILE" >> $GITHUB_OUTPUT
+          echo "name=$SAFE_NAME" >> $GITHUB_OUTPUT
+
+      - name: 提交友链文件
+        if: steps.create.outputs.exists != 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add "${{ steps.create.outputs.file }}"
+          git commit -m "feat: 添加友链 ${{ steps.parse.outputs.name }}"
+          git push
+
+      - name: 评论结果
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issueNumber = context.issue.number;
+            const name = '${{ steps.parse.outputs.name }}';
+            const url = '${{ steps.parse.outputs.url }}';
+            const hasBacklink = '${{ steps.backlink.outputs.hasBacklink }}' === 'true';
+            const exists = '${{ steps.create.outputs.exists }}' === 'true';
+
+            let body = '';
+            if (exists) {
+              body = `⏭️ **${name}** 的友链已存在，无需重复添加。`;
+            } else if (!hasBacklink) {
+              body = `## ❌ 友链申请未通过
+
+          **原因：** 未在你的站点 **${url}** 中找到本站 **https://iwexe.top** 的反向链接。
+
+          请先在 ` + '`<a href="https://iwexe.top" target="_blank">致靖的博客</a>`' + ` 添加到你的友链列表中，然后重新提交 Issue。`;
+            } else {
+              body = `## ✅ 友链申请已通过
+
+          **${name}** 已成功添加到友链页面 🎉
+
+          - 地址：${url}
+          - 反链验证：✅ 已确认
+
+          稍后可在 [友链页面](https://iwexe.top/friends) 查看。`;
+            }
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber,
+              body
+            });
+
+            if (!exists) {
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issueNumber,
+                state: 'closed',
+                state_reason: hasBacklink ? 'completed' : 'not_planned'
+              });
+            }

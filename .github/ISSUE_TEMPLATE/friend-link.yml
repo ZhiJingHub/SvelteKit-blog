@@ -1,0 +1,60 @@
+name: 友链申请
+description: 提交友链申请，通过后自动展示在友链页面
+title: "友链申请: [你的站点名称]"
+labels: ["友链申请"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 🌐 友链申请
+
+        请确保你已在你的网站添加了本站的友链，否则申请将不会被通过。
+
+        **本站信息：**
+        - 名称：致靖的博客
+        - 地址：https://iwexe.top
+        - 描述：Stay hungry, stay foolish.
+        - 图标：https://iwexe.top/favicon.svg
+
+  - type: input
+    id: name
+    attributes:
+      label: 站点名称
+      placeholder: 例如：致靖的博客
+    validations:
+      required: true
+
+  - type: input
+    id: url
+    attributes:
+      label: 站点地址
+      placeholder: 例如：https://example.com
+    validations:
+      required: true
+
+  - type: input
+    id: avatar
+    attributes:
+      label: 头像地址
+      placeholder: 例如：https://example.com/avatar.png
+      description: 可选，留空则显示站点名称首字母
+    validations:
+      required: false
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 站点描述
+      placeholder: 简单介绍一下你的站点
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: 确认事项
+      options:
+        - label: 我已在本站添加了致靖的博客的友链
+          required: true
+        - label: 我的站点内容合法合规，不含违法、色情、赌博等有害信息
+          required: true
