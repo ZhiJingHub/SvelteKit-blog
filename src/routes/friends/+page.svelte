@@ -1,17 +1,12 @@
 <script lang="ts">
 	import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '$lib/components/ui/card';
 	import * as Pagination from '$lib/components/ui/pagination';
-	import Icon from '@iconify/svelte';
 	import { siteConfig } from '$lib/config/site';
+	import type { PageData } from './$types';
 
-	interface Friend {
-		name: string;
-		avatar: string | null;
-		description?: string;
-		url: string;
-	}
+	let { data }: { data: PageData } = $props();
 
-	let friends = $state<Friend[]>([]);
+	let friends = $derived(data.friends);
 	let currentPage = $state(1);
 	const itemsPerPage = 12;
 	let totalPages = $derived(Math.ceil(friends.length / itemsPerPage));
