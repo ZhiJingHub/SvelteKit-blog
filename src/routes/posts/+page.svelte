@@ -6,7 +6,6 @@
 	import * as Pagination from '$lib/components/ui/pagination';
 	import Icon from '@iconify/svelte';
 	import { siteConfig } from '$lib/config/site';
-	import { onMount } from 'svelte';
 	import { spaCache } from '$lib/utils/spaCache';
 	import type { PageData } from './$types';
 
@@ -15,9 +14,8 @@
 
 	let searchQuery = $state('');
 	let searchDebounced = $state('');
-	let allPosts = $state<Array<{ title: string; link: string; description: string; date: string; content: string; wordCount: number; readTime: number }>>([]);
-	let isLoading = $state(false);
-	let hasLoaded = $state(false);
+	let searchIndex = $state<Array<{ title: string; link: string; description: string; content: string }>>([]);
+	let searchLoaded = $state(false);
 
 	let currentPage = $state(1);
 	const postsPerPage = 10;
@@ -33,45 +31,20 @@
 
 	let searchDebounceTimer: ReturnType<typeof setTimeout>;
 
-	function calculateWordCount(text: string): number {
-		const plainText = text.replace(/<[^>]*>/g, '');
-		const chineseChars = plainText.match(/[\u4e00-\u9fa5]/g) || [];
-		const englishWords = plainText.match(/[a-zA-Z]+/g) || [];
-		return chineseChars.length + englishWords.length;
-	}
-
-	function calculateReadTime(wordCount: number): number {
-		return Math.ceil(wordCount / 300);
-	}
-
-	async function loadRSS() {
-		if (hasLoaded) return;
-		isLoading = true;
-		allPosts = await spaCache.get('posts-rss', async () => {
-			const response = await fetch('/rss.xml');
-			const text = await response.text();
-			const parser = new DOMParser();
-			const xml = parser.parseFromString(text, 'text/xml');
-			const items = xml.querySelectorAll('item');
-
-			return Array.from(items).map(item => {
-				const content = item.querySelector('content\\:encoded, encoded')?.textContent || '';
-				const wordCount = calculateWordCount(content);
-				const readTime = calculateReadTime(wordCount);
-
-				return {
-					title: item.querySelector('title')?.textContent || '',
-					link: item.querySelector('link')?.textContent || '',
-					description: item.querySelector('description')?.textContent || '',
-					date: item.querySelector('pubDate')?.textContent || '',
-					content,
-					wordCount,
-					readTime
-				};
-			});
+	async function loadSearchIndex() {
+		if (searchLoaded) return;
+		searchIndex = await spaCache.get('search-index', async () => {
+			const res = await fetch('/rss.xml');
+			const text = await res.text();
+			const xml = new DOMParser().parseFromString(text, 'text/xml');
+			return Array.from(xml.querySelectorAll('item')).map(item => ({
+				title: item.querySelector('title')?.textContent || '',
+				link: item.querySelector('link')?.textContent || '',
+				description: item.querySelector('description')?.textContent || '',
+				content: item.querySelector('content\\:encoded, encoded')?.textContent || ''
+			}));
 		});
-		hasLoaded = true;
-		isLoading = false;
+		searchLoaded = true;
 	}
 
 	function parseQueryTerms(query: string): string[] {
@@ -101,28 +74,22 @@
 		const lines = content.split('\n');
 		const matched: string[] = [];
 		const MAX_MATCHES = 8;
-		const MIN_LINE_LEN = 10;
 
 		for (const line of lines) {
 			if (matched.length >= MAX_MATCHES) break;
 			const lower = line.toLowerCase();
 			if (!terms.every((t) => lower.includes(t))) continue;
 			const trimmed = line.trim();
-			if (trimmed && !trimmed.startsWith('#') && trimmed.length > MIN_LINE_LEN && !trimmed.startsWith('<')) {
+			if (trimmed && !trimmed.startsWith('#') && trimmed.length > 10 && !trimmed.startsWith('<')) {
 				matched.push(trimmed.substring(0, 200));
 			}
 		}
 		return matched;
 	}
 
-	function getPostStats(slug: string): { wordCount: number; readTime: number } | null {
-		const rssPost = allPosts.find(rss => rss.link.includes(slug));
-		return rssPost ? { wordCount: rssPost.wordCount, readTime: rssPost.readTime } : null;
-	}
-
 	$effect(() => {
 		clearTimeout(searchDebounceTimer);
-		if (searchQuery.trim()) loadRSS();
+		if (searchQuery.trim()) loadSearchIndex();
 		searchDebounceTimer = setTimeout(() => {
 			searchDebounced = searchQuery;
 		}, 200);
@@ -138,17 +105,17 @@
 		const terms = parseQueryTerms(searchDebounced);
 		if (terms.length === 0) return posts.map(p => ({ post: p, matchedLines: [] }));
 
-		const results: Array<{ post: typeof posts[0], matchedLines: string[] }> = [];
+		const results: Array<{ post: (typeof posts)[0]; matchedLines: string[] }> = [];
 		const MAX_SEARCH_RESULTS = 100;
 
 		for (const post of posts) {
 			if (results.length >= MAX_SEARCH_RESULTS) break;
-			const rssPost = allPosts.find(rss => rss.link.includes(post.slug));
-			if (!rssPost) continue;
+			const idx = searchIndex.find(rss => rss.link.includes(post.slug));
+			if (!idx) continue;
 
-			const title = rssPost.title.toLowerCase();
-			const desc = rssPost.description.toLowerCase();
-			const content = rssPost.content.toLowerCase();
+			const title = idx.title.toLowerCase();
+			const desc = idx.description.toLowerCase();
+			const content = idx.content.toLowerCase();
 			const slug_l = post.slug.toLowerCase();
 
 			const allHit = terms.every((t) => {
@@ -161,9 +128,8 @@
 			});
 			if (!allHit) continue;
 
-			const contentHasAll = searchFilters.content && terms.every((t) => content.includes(t));
-			const matchedLines = contentHasAll
-				? getMatchedContentLines(rssPost.content, searchDebounced)
+			const matchedLines = searchFilters.content && terms.every((t) => content.includes(t))
+				? getMatchedContentLines(idx.content, searchDebounced)
 				: [];
 			results.push({ post, matchedLines });
 		}
@@ -172,9 +138,8 @@
 	});
 
 	let paginatedPosts = $derived.by(() => {
-		const allResults = filteredPostsWithMatches;
 		const startIndex = (currentPage - 1) * postsPerPage;
-		return allResults.slice(startIndex, startIndex + postsPerPage);
+		return filteredPostsWithMatches.slice(startIndex, startIndex + postsPerPage);
 	});
 
 	let totalPages = $derived(Math.ceil(filteredPostsWithMatches.length / postsPerPage));
@@ -192,8 +157,7 @@
 	let hasAnyFilter = $derived(searchFilters.title || searchFilters.description || searchFilters.content || searchFilters.path);
 
 	let totalStats = $derived.by(() => {
-		if (!hasLoaded) return { totalPosts: posts.length, totalWords: 0 };
-		const totalWords = allPosts.reduce((sum, post) => sum + post.wordCount, 0);
+		const totalWords = posts.reduce((sum, p) => sum + (p.stats?.wordCount ?? 0), 0);
 		return { totalPosts: posts.length, totalWords };
 	});
 
@@ -205,10 +169,6 @@
 			day: 'numeric'
 		});
 	}
-
-	onMount(() => {
-		loadRSS();
-	});
 </script>
 
 <svelte:head>
@@ -220,18 +180,16 @@
 	<div class="mb-8 sm:mb-12 text-center">
 		<h1 class="mb-4 text-3xl sm:text-4xl font-bold">文章列表</h1>
 		<p class="text-muted-foreground">分享技术、想法和经验</p>
-		{#if hasLoaded}
-			<p class="mt-2 text-sm text-muted-foreground">
-				共 {totalStats.totalPosts} 篇文章 · 总计 {totalStats.totalWords.toLocaleString()} 字
-			</p>
-		{/if}
+		<p class="mt-2 text-sm text-muted-foreground">
+			共 {totalStats.totalPosts} 篇文章 · 总计 {totalStats.totalWords.toLocaleString()} 字
+		</p>
 	</div>
 
 	<div class="mb-6 sm:mb-8">
 		<Input
 			type="text"
 			bind:value={searchQuery}
-			onfocus={loadRSS}
+			onfocus={loadSearchIndex}
 			placeholder="搜索文章标题、描述或内容..."
 			class="w-full"
 		/>
@@ -294,13 +252,8 @@
 									<time class="shrink-0 text-sm text-muted-foreground">
 										{formatDate(post.metadata.published)}
 									</time>
-									{#if hasLoaded}
-										{@const stats = getPostStats(post.slug)}
-										{#if stats}
-											<span class="shrink-0 text-sm text-muted-foreground">· {stats.wordCount.toLocaleString()} 字</span>
-											<span class="shrink-0 text-sm text-muted-foreground">· 约 {stats.readTime} 分钟</span>
-										{/if}
-									{/if}
+									<span class="shrink-0 text-sm text-muted-foreground">· {post.stats.wordCount.toLocaleString()} 字</span>
+									<span class="shrink-0 text-sm text-muted-foreground">· 约 {post.stats.readTime} 分钟</span>
 								</div>
 
 								<h2 class="mb-2 text-xl sm:text-2xl font-semibold group-hover:text-primary break-words">
@@ -314,43 +267,40 @@
 								{#if matchedLines.length > 0}
 									{@const isExpanded = expandedCards[post.slug] ?? false}
 									{@const displayLines = isExpanded ? matchedLines : matchedLines.slice(0, 2)}
-									{@const hasMore = matchedLines.length > 2}
 
-									<div class="mt-3 space-y-1.5">
-										<div class="space-y-1 border-l-2 border-primary/30 pl-3">
-											{#each displayLines as line}
-												<button
-													type="button"
-													onclick={(e) => {
-														e.preventDefault();
-														e.stopPropagation();
-														window.open(`/posts/${post.slug}?highlight=${encodeURIComponent(searchQuery)}`, '_blank');
-													}}
-													class="block w-full text-left text-xs sm:text-sm text-muted-foreground hover:text-foreground transition-colors"
-												>
-													<span class="inline-flex items-start gap-1.5">
-														<Icon icon="mdi:arrow-right-thin" class="size-3.5 sm:size-4 flex-shrink-0 mt-0.5 opacity-50" />
-														<span class="line-clamp-2">{@html highlightText(line, searchDebounced)}</span>
-													</span>
-												</button>
-											{/each}
-										</div>
-
-										{#if hasMore}
+									<div class="mt-3 space-y-1 border-l-2 border-primary/30 pl-3">
+										{#each displayLines as line}
 											<button
 												type="button"
 												onclick={(e) => {
 													e.preventDefault();
 													e.stopPropagation();
-													expandedCards[post.slug] = !isExpanded;
+													window.open(`/posts/${post.slug}?highlight=${encodeURIComponent(searchQuery)}`, '_blank');
 												}}
-												class="text-xs text-primary hover:underline flex items-center gap-1"
+												class="block w-full text-left text-xs sm:text-sm text-muted-foreground hover:text-foreground transition-colors"
 											>
-												<Icon icon={isExpanded ? 'mdi:chevron-up' : 'mdi:chevron-down'} class="size-3.5" />
-												{isExpanded ? '收起' : `展开 (还有 ${matchedLines.length - 2} 条)`}
+												<span class="inline-flex items-start gap-1.5">
+													<Icon icon="mdi:arrow-right-thin" class="size-3.5 sm:size-4 flex-shrink-0 mt-0.5 opacity-50" />
+													<span class="line-clamp-2">{@html highlightText(line, searchDebounced)}</span>
+												</span>
 											</button>
-										{/if}
+										{/each}
 									</div>
+
+									{#if matchedLines.length > 2}
+										<button
+											type="button"
+											onclick={(e) => {
+												e.preventDefault();
+												e.stopPropagation();
+												expandedCards[post.slug] = !isExpanded;
+											}}
+											class="mt-1 text-xs text-primary hover:underline flex items-center gap-1"
+										>
+											<Icon icon={isExpanded ? 'mdi:chevron-up' : 'mdi:chevron-down'} class="size-3.5" />
+											{isExpanded ? '收起' : `展开 (还有 ${matchedLines.length - 2} 条)`}
+										</button>
+									{/if}
 								{/if}
 							</div>
 						</div>
@@ -371,25 +321,15 @@
 			<Pagination.Root count={filteredPostsWithMatches.length} perPage={postsPerPage} bind:page={currentPage}>
 				{#snippet children({ pages })}
 					<Pagination.Content>
-						<Pagination.Item>
-							<Pagination.PrevButton />
-						</Pagination.Item>
+						<Pagination.Item><Pagination.PrevButton /></Pagination.Item>
 						{#each pages as page (page.key)}
 							{#if page.type === 'ellipsis'}
-								<Pagination.Item>
-									<Pagination.Ellipsis />
-								</Pagination.Item>
+								<Pagination.Item><Pagination.Ellipsis /></Pagination.Item>
 							{:else}
-								<Pagination.Item>
-									<Pagination.Link {page} isActive={currentPage === page.value}>
-										{page.value}
-									</Pagination.Link>
-								</Pagination.Item>
+								<Pagination.Item><Pagination.Link {page} isActive={currentPage === page.value}>{page.value}</Pagination.Link></Pagination.Item>
 							{/if}
 						{/each}
-						<Pagination.Item>
-							<Pagination.NextButton />
-						</Pagination.Item>
+						<Pagination.Item><Pagination.NextButton /></Pagination.Item>
 					</Pagination.Content>
 				{/snippet}
 			</Pagination.Root>

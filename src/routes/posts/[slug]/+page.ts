@@ -1,5 +1,6 @@
 import { getAllPosts, getPostBySlug, getPostComponent } from '$lib/utils/posts';
 import { resolvePostAssetPath } from '$lib/utils/markdown';
+import { postStats } from '$lib/data/post-stats';
 import { error } from '@sveltejs/kit';
 import type { EntryGenerator, PageLoad } from './$types';
 
@@ -32,6 +33,7 @@ export const load: PageLoad = async ({ params }) => {
 			...post,
 			metadata
 		},
+		stats: postStats[params.slug] ?? { wordCount: 0, readTime: 1 },
 		component,
 		slug: params.slug
 	};

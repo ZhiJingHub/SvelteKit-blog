@@ -7,6 +7,7 @@
 	import { siteConfig } from '$lib/config/site';
 	import ImageViewer from '$lib/components/ImageViewer.svelte';
 	import PostToc from '$lib/components/PostToc.svelte';
+	import PageViews from '$lib/components/PageViews.svelte';
 	import { highlightCodeBlocksIn } from '$lib/utils/highlight';
 	import { renderMermaidIn } from '$lib/utils/mermaid';
 	import type { PageData } from './$types';
@@ -158,9 +159,12 @@
 			<time class="text-xs sm:text-sm text-muted-foreground">
 				{formatDate(data.post.metadata.published)}
 			</time>
+			<span class="text-xs sm:text-sm text-muted-foreground">· {data.stats.wordCount.toLocaleString()} 字</span>
+			<span class="text-xs sm:text-sm text-muted-foreground">· 约 {data.stats.readTime} 分钟</span>
 			{#if data.post.metadata.updated}
 				<span class="text-xs sm:text-sm text-muted-foreground">· 更新于 {formatDate(data.post.metadata.updated)}</span>
 			{/if}
+			<PageViews pathname="/posts/{data.slug}/" class="text-xs sm:text-sm text-muted-foreground" />
 		</div>
 
 		<h1 class="mb-4 text-2xl sm:text-3xl md:text-4xl font-bold">{data.post.metadata.title}</h1>
