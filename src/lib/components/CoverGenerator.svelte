@@ -40,7 +40,7 @@
 
 	let textShadow = $state({ x: 0, y: 0, blur: 0, color: '#000000', alpha: 0 });
 	let iconShadow = $state({ x: 0, y: 0, blur: 0, color: '#000000', alpha: 0 });
-	let shadowTarget = $state<string>('both');
+	let shadowTarget = $state<'both' | 'text' | 'icon'>('both');
 
 	let iconBgEnabled = $state(false);
 	let iconBgRadius = $state(20);
@@ -58,15 +58,26 @@
 	let isBgDragOver = $state(false);
 	let isDragging = $state(false);
 
-	let ratios = $state([{ label: '1:1', w: 1, h: 1, checked: false }, { label: '4:3', w: 4, h: 3, checked: false }, { label: '16:9', w: 16, h: 9, checked: true }, { label: '21:9', w: 21, h: 9, checked: false }]);
+	let ratios = $state([
+		{ label: '1:1', w: 1, h: 1, checked: false },
+		{ label: '4:3', w: 4, h: 3, checked: false },
+		{ label: '16:9', w: 16, h: 9, checked: true },
+		{ label: '21:9', w: 21, h: 9, checked: false }
+	]);
 
 	let linkScale = $state(true);
 	let lastFontSize = $state(64);
 	let lastIconSize = $state(64);
 
-	let exportConfig = $state({ format: 'png' as 'png' | 'svg', scales: [1] as number[], filename: 'cover', transparentBg: false, exportRatios: [] as string[] });
+	let exportConfig = $state({
+		format: 'png' as 'png' | 'svg',
+		scales: [1] as number[],
+		filename: 'cover',
+		transparentBg: false,
+		exportRatios: [] as string[]
+	});
 
-	let svgContainer: SVGSVGElement | undefined = $state();
+	let svgContainer: SVGSVGElement;
 	let dragStartX = 0; let dragStartY = 0; let initialImageX = 0; let initialImageY = 0;
 	let activePointers = new Map<number, { x: number; y: number }>();
 	let initialPinchDistance = 0; let initialScale = 1;
@@ -110,20 +121,15 @@
 		const reader = new FileReader();
 		reader.onload = (e) => {
 			bgImage = e.target?.result as string;
-			const img = new Image();
-			img.onload = () => {
-				const fitScale = Math.min(canvasWidth / img.naturalWidth, canvasHeight / img.naturalHeight);
-				bgImageScale = Math.max(fitScale, 0.1);
-				bgImageX = (canvasWidth - img.naturalWidth * bgImageScale) / 2;
-				bgImageY = (canvasHeight - img.naturalHeight * bgImageScale) / 2;
-				bgBlur = 0; bgOpacity = 1;
-			};
-			img.src = e.target?.result as string;
+			bgImageX = 0; bgImageY = 0; bgImageScale = 1; bgBlur = 0; bgOpacity = 1;
 		};
 		reader.readAsDataURL(file);
 	}
 
-	function handleBgImageUpload(e: Event) { const file = (e.target as HTMLInputElement).files?.[0]; if (file) loadBgImageFile(file); }
+	function handleBgImageUpload(e: Event) {
+		const file = (e.target as HTMLInputElement).files?.[0];
+		if (file) loadBgImageFile(file);
+	}
 
 	function handleFontUpload(e: Event) {
 		const file = (e.target as HTMLInputElement).files?.[0];
@@ -194,14 +200,12 @@
 	function handleWheel(e: WheelEvent) {
 		if (!bgImage) return;
 		e.preventDefault();
-		const cx = canvasWidth / 2;
-		const cy = canvasHeight / 2;
-		const oldScale = bgImageScale;
-		const newScale = e.deltaY < 0 ? Math.min(oldScale * 1.1, 10) : Math.max(oldScale / 1.1, 0.1);
-		const ratio = newScale / oldScale;
-		bgImageX = cx - (cx - bgImageX) * ratio;
-		bgImageY = cy - (cy - bgImageY) * ratio;
-		bgImageScale = newScale;
+		const scaleFactor = 1.1;
+		if (e.deltaY < 0) {
+			bgImageScale = Math.min(bgImageScale * scaleFactor, 10);
+		} else {
+			bgImageScale = Math.max(bgImageScale / scaleFactor, 0.1);
+		}
 	}
 
 	async function doExport() {
@@ -247,20 +251,37 @@
 		if (iconName?.includes(':')) {
 			const [prefix, name] = iconName.split(':');
 			fetch(`https://api.iconify.design/${prefix}/${name}.svg`)
-				.then(r => r.text())
-				.then(svg => {
-					let s = svg.replace(/width="[^"]*"/g, '').replace(/height="[^"]*"/g, '');
-					s = s.replace(/<svg\b([^>]*)>/, '<svg$1 width="100%" height="100%" preserveAspectRatio="xMidYMid meet">');
-					if (!useOriginalIconColor) s = s.replace(/fill="[^"]*"/g, 'fill="currentColor"');
-					iconSvg = s;
-				}).catch(() => { iconSvg = ''; });
-		} else { iconSvg = ''; }
+				.then((res) => {
+					if (!res.ok) throw new Error('Icon not found');
+					return res.text();
+				})
+				.then((svg) => {
+					let processedSvg = svg
+						.replace(/width="[^"]*"/g, '')
+						.replace(/height="[^"]*"/g, '');
+					processedSvg = processedSvg.replace(
+						/<svg\b([^>]*)>/,
+						'<svg$1 width="100%" height="100%" preserveAspectRatio="xMidYMid meet">'
+					);
+					if (!useOriginalIconColor) {
+						processedSvg = processedSvg.replace(/fill="[^"]*"/g, 'fill="currentColor"');
+					}
+					iconSvg = processedSvg;
+				})
+				.catch(() => {
+					iconSvg = '';
+				});
+		} else {
+			iconSvg = '';
+		}
 	});
 
 	onMount(() => {
 		bgColor = '#ffffff';
 		color = '#000000';
 		iconColor = '#000000';
+		textShadow = { x: 0, y: 0, blur: 0, color: '#000000', alpha: 0 };
+		iconShadow = { x: 0, y: 0, blur: 0, color: '#000000', alpha: 0 };
 	});
 </script>
 
