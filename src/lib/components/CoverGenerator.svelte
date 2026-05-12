@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import CoverPreview from './cover/CoverPreview.svelte';
 	import TextSettings from './cover/TextSettings.svelte';
 	import IconSettings from './cover/IconSettings.svelte';
@@ -8,6 +9,7 @@
 	import IconBackgroundSettings from './cover/IconBackgroundSettings.svelte';
 	import ShadowSettings from './cover/ShadowSettings.svelte';
 	import ExportSettings from './cover/ExportSettings.svelte';
+	import * as Tabs from '$lib/components/ui/tabs';
 
 	let leftText = $state('鸣潮');
 	let rightText = $state('牛逼');
@@ -228,7 +230,9 @@
 				for (const sc of (exportConfig.scales.length > 0 ? exportConfig.scales : [1])) {
 					const c = document.createElement('canvas'); c.width = rw * sc; c.height = rh * sc;
 					const ctx = c.getContext('2d'); if (!ctx) continue;
-					ctx.imageSmoothingEnabled = true; ctx.drawImage(img, 0, 0, c.width, c.height);
+					ctx.imageSmoothingEnabled = true;
+					ctx.imageSmoothingQuality = 'high';
+					ctx.drawImage(img, 0, 0, c.width, c.height);
 					downloadLink(c.toDataURL('image/png'), `${name}${exportConfig.scales.length > 1 ? `@${sc}x` : ''}.png`);
 				}
 			}
@@ -252,6 +256,12 @@
 				}).catch(() => { iconSvg = ''; });
 		} else { iconSvg = ''; }
 	});
+
+	onMount(() => {
+		bgColor = '#ffffff';
+		color = '#000000';
+		iconColor = '#000000';
+	});
 </script>
 
 <div class="flex flex-col lg:flex-row gap-6 w-full">
@@ -261,6 +271,29 @@
 		</div>
 	</div>
 	<div class="w-full lg:flex-1">
+		<div class="lg:hidden">
+			<Tabs.Root value="content" class="w-full">
+				<Tabs.List class="grid w-full grid-cols-3">
+					<Tabs.Trigger value="content">内容</Tabs.Trigger>
+					<Tabs.Trigger value="style">样式</Tabs.Trigger>
+					<Tabs.Trigger value="export">导出</Tabs.Trigger>
+				</Tabs.List>
+				<Tabs.Content value="content" class="space-y-6 mt-6">
+					<TextSettings bind:leftText bind:rightText bind:fontWeight bind:customFontName onFontUpload={handleFontUpload} onSystemFontSelect={handleSystemFontSelect} onRemoveFont={() => { customFont = null; customFontName = ''; }} />
+					<IconSettings bind:showIcon bind:localIcon bind:searchQuery bind:searchResults bind:iconName {isSearching} onLocalIconUpload={handleLocalIconUpload} {onSearchInput} onSelectIcon={selectIcon} />
+					<BackgroundSettings bind:bgImage bind:bgBlur bind:bgOpacity bind:isBgDragOver onBgImageUpload={handleBgImageUpload} onBgDragOver={handleBgDragOver} onBgDragLeave={handleBgDragLeave} onBgDrop={handleBgDrop} />
+				</Tabs.Content>
+				<Tabs.Content value="style" class="space-y-6 mt-6">
+					<SizeSettings bind:fontSize bind:iconSize bind:iconRadius bind:gap bind:linkScale onFontSizeChange={handleFontSizeChange} onIconSizeChange={handleIconSizeChange} />
+					<ColorSettings bind:color bind:iconColor bind:bgColor bind:bgColorOpacity bind:linkColor bind:useOriginalIconColor onColorChange={handleColorChange} />
+					<IconBackgroundSettings bind:iconBgEnabled bind:iconBgColor bind:iconBgPadding bind:iconBgRadius bind:iconBgBlur bind:iconBgOpacity />
+					<ShadowSettings bind:shadowTarget {textShadow} {iconShadow} onUpdateShadow={updateShadow} />
+				</Tabs.Content>
+				<Tabs.Content value="export" class="space-y-6 mt-6">
+					<ExportSettings bind:ratios bind:exportConfig {activeRatios} canvasWidth={canvasWidth} canvasHeight={canvasHeight} onExport={doExport} />
+				</Tabs.Content>
+			</Tabs.Root>
+		</div>
 		<div class="hidden lg:grid lg:grid-cols-3 gap-6">
 			<div class="space-y-6">
 				<h2 class="text-lg font-semibold mb-4">内容</h2>
