@@ -77,6 +77,9 @@
 		exportRatios: [] as string[]
 	});
 
+	let innerWidth = $state(0);
+	let isDesktop = $derived(innerWidth >= 1024);
+
 	let svgContainer: SVGSVGElement;
 	let dragStartX = 0; let dragStartY = 0; let initialImageX = 0; let initialImageY = 0;
 	let activePointers = new Map<number, { x: number; y: number }>();
@@ -285,6 +288,8 @@
 	});
 </script>
 
+<svelte:window bind:innerWidth />
+
 <div class="flex flex-col lg:flex-row gap-6 w-full">
 	<div class="flex-1 lg:max-w-[55%]">
 		<div class="lg:sticky lg:top-20">
@@ -292,47 +297,50 @@
 		</div>
 	</div>
 	<div class="w-full lg:flex-1">
-		<div class="lg:hidden">
-			<Tabs.Root value="content" class="w-full">
-				<Tabs.List class="grid w-full grid-cols-3">
-					<Tabs.Trigger value="content">内容</Tabs.Trigger>
-					<Tabs.Trigger value="style">样式</Tabs.Trigger>
-					<Tabs.Trigger value="export">导出</Tabs.Trigger>
-				</Tabs.List>
-				<Tabs.Content value="content" class="space-y-6 mt-6">
+		{#if !isDesktop}
+			<div class="w-full">
+				<Tabs.Root value="content" class="w-full">
+					<Tabs.List class="grid w-full grid-cols-3">
+						<Tabs.Trigger value="content">内容</Tabs.Trigger>
+						<Tabs.Trigger value="style">样式</Tabs.Trigger>
+						<Tabs.Trigger value="export">导出</Tabs.Trigger>
+					</Tabs.List>
+					<Tabs.Content value="content" class="space-y-6 mt-6">
+						<TextSettings bind:leftText bind:rightText bind:fontWeight bind:customFontName onFontUpload={handleFontUpload} onSystemFontSelect={handleSystemFontSelect} onRemoveFont={() => { customFont = null; customFontName = ''; }} />
+						<IconSettings bind:showIcon bind:localIcon bind:searchQuery bind:searchResults bind:iconName {isSearching} onLocalIconUpload={handleLocalIconUpload} {onSearchInput} onSelectIcon={selectIcon} />
+						<BackgroundSettings bind:bgImage bind:bgBlur bind:bgOpacity bind:isBgDragOver onBgImageUpload={handleBgImageUpload} onBgDragOver={handleBgDragOver} onBgDragLeave={handleBgDragLeave} onBgDrop={handleBgDrop} />
+					</Tabs.Content>
+					<Tabs.Content value="style" class="space-y-6 mt-6">
+						<SizeSettings bind:fontSize bind:iconSize bind:iconRadius bind:gap bind:linkScale onFontSizeChange={handleFontSizeChange} onIconSizeChange={handleIconSizeChange} />
+						<ColorSettings bind:color bind:iconColor bind:bgColor bind:bgColorOpacity bind:linkColor bind:useOriginalIconColor onColorChange={handleColorChange} />
+						<IconBackgroundSettings bind:iconBgEnabled bind:iconBgColor bind:iconBgPadding bind:iconBgRadius bind:iconBgBlur bind:iconBgOpacity />
+						<ShadowSettings bind:shadowTarget {textShadow} {iconShadow} onUpdateShadow={updateShadow} />
+					</Tabs.Content>
+					<Tabs.Content value="export" class="space-y-6 mt-6">
+						<ExportSettings bind:ratios bind:exportConfig {activeRatios} canvasWidth={canvasWidth} canvasHeight={canvasHeight} onExport={doExport} />
+					</Tabs.Content>
+				</Tabs.Root>
+			</div>
+		{:else}
+			<div class="grid grid-cols-3 gap-6">
+				<div class="space-y-6">
+					<h2 class="text-lg font-semibold mb-4">内容</h2>
 					<TextSettings bind:leftText bind:rightText bind:fontWeight bind:customFontName onFontUpload={handleFontUpload} onSystemFontSelect={handleSystemFontSelect} onRemoveFont={() => { customFont = null; customFontName = ''; }} />
 					<IconSettings bind:showIcon bind:localIcon bind:searchQuery bind:searchResults bind:iconName {isSearching} onLocalIconUpload={handleLocalIconUpload} {onSearchInput} onSelectIcon={selectIcon} />
 					<BackgroundSettings bind:bgImage bind:bgBlur bind:bgOpacity bind:isBgDragOver onBgImageUpload={handleBgImageUpload} onBgDragOver={handleBgDragOver} onBgDragLeave={handleBgDragLeave} onBgDrop={handleBgDrop} />
-				</Tabs.Content>
-				<Tabs.Content value="style" class="space-y-6 mt-6">
+				</div>
+				<div class="space-y-6">
+					<h2 class="text-lg font-semibold mb-4">样式</h2>
 					<SizeSettings bind:fontSize bind:iconSize bind:iconRadius bind:gap bind:linkScale onFontSizeChange={handleFontSizeChange} onIconSizeChange={handleIconSizeChange} />
 					<ColorSettings bind:color bind:iconColor bind:bgColor bind:bgColorOpacity bind:linkColor bind:useOriginalIconColor onColorChange={handleColorChange} />
 					<IconBackgroundSettings bind:iconBgEnabled bind:iconBgColor bind:iconBgPadding bind:iconBgRadius bind:iconBgBlur bind:iconBgOpacity />
 					<ShadowSettings bind:shadowTarget {textShadow} {iconShadow} onUpdateShadow={updateShadow} />
-				</Tabs.Content>
-				<Tabs.Content value="export" class="space-y-6 mt-6">
+				</div>
+				<div class="space-y-6">
+					<h2 class="text-lg font-semibold mb-4">导出</h2>
 					<ExportSettings bind:ratios bind:exportConfig {activeRatios} canvasWidth={canvasWidth} canvasHeight={canvasHeight} onExport={doExport} />
-				</Tabs.Content>
-			</Tabs.Root>
-		</div>
-		<div class="hidden lg:grid lg:grid-cols-3 gap-6">
-			<div class="space-y-6">
-				<h2 class="text-lg font-semibold mb-4">内容</h2>
-				<TextSettings bind:leftText bind:rightText bind:fontWeight bind:customFontName onFontUpload={handleFontUpload} onSystemFontSelect={handleSystemFontSelect} onRemoveFont={() => { customFont = null; customFontName = ''; }} />
-				<IconSettings bind:showIcon bind:localIcon bind:searchQuery bind:searchResults bind:iconName {isSearching} onLocalIconUpload={handleLocalIconUpload} {onSearchInput} onSelectIcon={selectIcon} />
-				<BackgroundSettings bind:bgImage bind:bgBlur bind:bgOpacity bind:isBgDragOver onBgImageUpload={handleBgImageUpload} onBgDragOver={handleBgDragOver} onBgDragLeave={handleBgDragLeave} onBgDrop={handleBgDrop} />
+				</div>
 			</div>
-			<div class="space-y-6">
-				<h2 class="text-lg font-semibold mb-4">样式</h2>
-				<SizeSettings bind:fontSize bind:iconSize bind:iconRadius bind:gap bind:linkScale onFontSizeChange={handleFontSizeChange} onIconSizeChange={handleIconSizeChange} />
-				<ColorSettings bind:color bind:iconColor bind:bgColor bind:bgColorOpacity bind:linkColor bind:useOriginalIconColor onColorChange={handleColorChange} />
-				<IconBackgroundSettings bind:iconBgEnabled bind:iconBgColor bind:iconBgPadding bind:iconBgRadius bind:iconBgBlur bind:iconBgOpacity />
-				<ShadowSettings bind:shadowTarget {textShadow} {iconShadow} onUpdateShadow={updateShadow} />
-			</div>
-			<div class="space-y-6">
-				<h2 class="text-lg font-semibold mb-4">导出</h2>
-				<ExportSettings bind:ratios bind:exportConfig {activeRatios} canvasWidth={canvasWidth} canvasHeight={canvasHeight} onExport={doExport} />
-			</div>
-		</div>
+		{/if}
 	</div>
 </div>
