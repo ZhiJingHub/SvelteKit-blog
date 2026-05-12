@@ -11,6 +11,7 @@
 		searchQuery = $bindable(),
 		searchResults = $bindable(),
 		iconName = $bindable(),
+		isSearching,
 		onLocalIconUpload,
 		onSearchInput,
 		onSelectIcon
@@ -20,6 +21,7 @@
 		searchQuery: string;
 		searchResults: string[];
 		iconName: string;
+		isSearching: boolean;
 		onLocalIconUpload: (e: Event) => void;
 		onSearchInput: (e: Event) => void;
 		onSelectIcon: (icon: string) => void;
@@ -48,7 +50,11 @@
 			<Input value={searchQuery} oninput={onSearchInput} placeholder="搜索图标库..." class="h-10" />
 		</div>
 
-		{#if searchResults.length > 0}
+		{#if isSearching}
+			<div class="text-xs text-muted-foreground text-center py-4">搜索中...</div>
+		{:else if searchQuery && searchResults.length === 0}
+			<div class="text-xs text-muted-foreground text-center py-4">未找到匹配图标</div>
+		{:else if searchResults.length > 0}
 			<div class="max-h-48 overflow-y-auto border rounded-lg p-2">
 				<div class="grid gap-2" style="grid-template-columns: repeat(auto-fit, minmax(48px, 1fr));">
 					{#each searchResults as icon}

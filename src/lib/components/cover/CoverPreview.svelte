@@ -33,7 +33,9 @@
 		<rect width="100%" height="100%" fill="url(#checkerboard)" />
 		<rect width="100%" height="100%" fill={hexToRgba(bgColor, bgColorOpacity)} />
 		{#if bgImage}
-			<image href={bgImage} x={bgImageX} y={bgImageY} width={canvasWidth} height={canvasHeight} transform="scale({bgImageScale})" style="transform-origin: 50% 50%; filter: blur({bgBlur}px); opacity: {bgOpacity};" preserveAspectRatio="xMidYMid meet" />
+			<g transform="translate({bgImageX}, {bgImageY}) scale({bgImageScale})">
+				<image href={bgImage} x="0" y="0" width={canvasWidth} height={canvasHeight} style="filter: blur({bgBlur}px); opacity: {bgOpacity};" preserveAspectRatio="xMidYMid meet" />
+			</g>
 		{/if}
 		<foreignObject x="0" y="0" width="100%" height="100%" style="pointer-events: none;">
 			<div xmlns="http://www.w3.org/1999/xhtml" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; gap: {gap}px; font-family: {customFontName || 'sans-serif'}; font-weight: {fontWeight};">

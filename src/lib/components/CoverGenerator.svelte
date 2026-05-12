@@ -24,6 +24,7 @@
 	let searchResults = $state<string[]>([]);
 	let isSearching = $state(false);
 	let searchDebounce: ReturnType<typeof setTimeout>;
+	let searchAbort: AbortController | null = null;
 
 	let fontSize = $state(64);
 	let customFont = $state<string | null>(null);
@@ -105,7 +106,18 @@
 	function loadBgImageFile(file: File) {
 		if (!file.type.startsWith('image/')) return;
 		const reader = new FileReader();
-		reader.onload = (e) => { bgImage = e.target?.result as string; bgImageX = 0; bgImageY = 0; bgImageScale = 1; bgBlur = 0; bgOpacity = 1; };
+		reader.onload = (e) => {
+			bgImage = e.target?.result as string;
+			const img = new Image();
+			img.onload = () => {
+				const fitScale = Math.min(canvasWidth / img.naturalWidth, canvasHeight / img.naturalHeight);
+				bgImageScale = Math.max(fitScale, 0.1);
+				bgImageX = (canvasWidth - img.naturalWidth * bgImageScale) / 2;
+				bgImageY = (canvasHeight - img.naturalHeight * bgImageScale) / 2;
+				bgBlur = 0; bgOpacity = 1;
+			};
+			img.src = e.target?.result as string;
+		};
 		reader.readAsDataURL(file);
 	}
 
@@ -128,13 +140,15 @@
 	function handleSystemFontSelect(fontName: string) { customFontName = fontName; customFont = null; }
 
 	async function handleSearch() {
+		if (searchAbort) searchAbort.abort();
 		if (!searchQuery) { searchResults = []; return; }
 		isSearching = true;
+		searchAbort = new AbortController();
 		try {
-			const res = await fetch(`https://api.iconify.design/search?query=${encodeURIComponent(searchQuery)}&limit=20`);
+			const res = await fetch(`https://api.iconify.design/search?query=${encodeURIComponent(searchQuery)}&limit=20`, { signal: searchAbort.signal });
 			const data = await res.json();
 			searchResults = data.icons || [];
-		} catch { searchResults = []; }
+		} catch { if (!searchAbort?.signal.aborted) searchResults = []; }
 		isSearching = false;
 	}
 
@@ -175,7 +189,18 @@
 
 	function handlePointerUp(e: PointerEvent) { activePointers.delete(e.pointerId); (e.currentTarget as Element).releasePointerCapture(e.pointerId); if (activePointers.size < 2) initialPinchDistance = 0; if (activePointers.size === 0) isDragging = false; }
 
-	function handleWheel(e: WheelEvent) { if (!bgImage) return; e.preventDefault(); bgImageScale = e.deltaY < 0 ? Math.min(bgImageScale * 1.1, 10) : Math.max(bgImageScale / 1.1, 0.1); }
+	function handleWheel(e: WheelEvent) {
+		if (!bgImage) return;
+		e.preventDefault();
+		const cx = canvasWidth / 2;
+		const cy = canvasHeight / 2;
+		const oldScale = bgImageScale;
+		const newScale = e.deltaY < 0 ? Math.min(oldScale * 1.1, 10) : Math.max(oldScale / 1.1, 0.1);
+		const ratio = newScale / oldScale;
+		bgImageX = cx - (cx - bgImageX) * ratio;
+		bgImageY = cy - (cy - bgImageY) * ratio;
+		bgImageScale = newScale;
+	}
 
 	async function doExport() {
 		if (!svgContainer) return;
@@ -195,7 +220,10 @@
 			const name = activeRatios.length > 1 ? `${exportConfig.filename}-${ratio.label.replace(':', '-')}` : exportConfig.filename;
 			if (exportConfig.format === 'svg') { const b = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' }); downloadLink(URL.createObjectURL(b), `${name}.svg`); }
 			else {
-				const img = new Image(); img.src = `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svgData)))}`;
+				const img = new Image();
+				const bytes = new TextEncoder().encode(svgData);
+				const binary = Array.from(bytes, (b) => String.fromCharCode(b)).join('');
+				img.src = `data:image/svg+xml;base64,${btoa(binary)}`;
 				await new Promise<void>(r => { img.onload = () => r(); });
 				for (const sc of (exportConfig.scales.length > 0 ? exportConfig.scales : [1])) {
 					const c = document.createElement('canvas'); c.width = rw * sc; c.height = rh * sc;
@@ -237,7 +265,7 @@
 			<div class="space-y-6">
 				<h2 class="text-lg font-semibold mb-4">内容</h2>
 				<TextSettings bind:leftText bind:rightText bind:fontWeight bind:customFontName onFontUpload={handleFontUpload} onSystemFontSelect={handleSystemFontSelect} onRemoveFont={() => { customFont = null; customFontName = ''; }} />
-				<IconSettings bind:showIcon bind:localIcon bind:searchQuery bind:searchResults bind:iconName onLocalIconUpload={handleLocalIconUpload} {onSearchInput} onSelectIcon={selectIcon} />
+				<IconSettings bind:showIcon bind:localIcon bind:searchQuery bind:searchResults bind:iconName {isSearching} onLocalIconUpload={handleLocalIconUpload} {onSearchInput} onSelectIcon={selectIcon} />
 				<BackgroundSettings bind:bgImage bind:bgBlur bind:bgOpacity bind:isBgDragOver onBgImageUpload={handleBgImageUpload} onBgDragOver={handleBgDragOver} onBgDragLeave={handleBgDragLeave} onBgDrop={handleBgDrop} />
 			</div>
 			<div class="space-y-6">
