@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import * as Tabs from '$lib/components/ui/tabs';
 	import CoverPreview from './cover/CoverPreview.svelte';
 	import TextSettings from './cover/TextSettings.svelte';
@@ -10,6 +10,10 @@
 	import IconBackgroundSettings from './cover/IconBackgroundSettings.svelte';
 	import ShadowSettings from './cover/ShadowSettings.svelte';
 	import ExportSettings from './cover/ExportSettings.svelte';
+
+	// 窗口响应式
+	let innerWidth = $state(0);
+	let isDesktop = $derived(innerWidth >= 1024);
 
 	// 文本状态
 	let leftText = $state('鸣潮');
@@ -75,8 +79,7 @@
 		{ label: '21:9', w: 21, h: 9, checked: false }
 	]);
 
-	// 缩放链接状态：lastFontSize/lastIconSize 是用户上次调整的快照，
-	// 仅由 handleFontSizeChange / handleIconSizeChange 写入，初值与 fontSize/iconSize 同源（64）
+	// 缩放链接状态
 	let linkScale = $state(true);
 	let lastFontSize = $state(64);
 	let lastIconSize = $state(64);
@@ -183,6 +186,7 @@
 	function handleFontUpload(e: Event) {
 		const file = (e.target as HTMLInputElement).files?.[0];
 		if (file) {
+			if (customFont) URL.revokeObjectURL(customFont);
 			const reader = new FileReader();
 			reader.onload = (e) => {
 				const fontData = e.target?.result as ArrayBuffer;
@@ -362,9 +366,12 @@
 				const blob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
 				const url = URL.createObjectURL(blob);
 				downloadLink(url, `${ratioFilename}.svg`);
+				setTimeout(() => URL.revokeObjectURL(url), 1000);
 			} else {
 				const img = new Image();
-				img.src = `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svgData)))}`;
+				const bytes = new TextEncoder().encode(svgData);
+				const binary = Array.from(bytes, (b) => String.fromCharCode(b)).join('');
+				img.src = `data:image/svg+xml;base64,${btoa(binary)}`;
 				await new Promise<void>((resolve) => {
 					img.onload = () => resolve();
 				});
@@ -434,7 +441,95 @@
 		textShadow = { x: 0, y: 0, blur: 0, color: '#000000', alpha: 0 };
 		iconShadow = { x: 0, y: 0, blur: 0, color: '#000000', alpha: 0 };
 	});
+
+	onDestroy(() => {
+		if (customFont) URL.revokeObjectURL(customFont);
+		clearTimeout(searchDebounce);
+	});
 </script>
+
+<svelte:window bind:innerWidth />
+
+{#snippet contentSettings()}
+	<TextSettings
+		bind:leftText
+		bind:rightText
+		bind:fontWeight
+		bind:customFontName
+		onFontUpload={handleFontUpload}
+		onSystemFontSelect={handleSystemFontSelect}
+		onRemoveFont={() => {
+			customFont = null;
+			customFontName = '';
+		}}
+	/>
+	<IconSettings
+		bind:showIcon
+		bind:localIcon
+		bind:searchQuery
+		bind:searchResults
+		bind:iconName
+		onLocalIconUpload={handleLocalIconUpload}
+		{onSearchInput}
+		onSelectIcon={selectIcon}
+	/>
+	<BackgroundSettings
+		bind:bgImage
+		bind:bgBlur
+		bind:bgOpacity
+		bind:isBgDragOver
+		onBgImageUpload={handleBgImageUpload}
+		onBgDragOver={handleBgDragOver}
+		onBgDragLeave={handleBgDragLeave}
+		onBgDrop={handleBgDrop}
+	/>
+{/snippet}
+
+{#snippet styleSettings()}
+	<SizeSettings
+		bind:fontSize
+		bind:iconSize
+		bind:iconRadius
+		bind:gap
+		bind:linkScale
+		onFontSizeChange={handleFontSizeChange}
+		onIconSizeChange={handleIconSizeChange}
+	/>
+	<ColorSettings
+		bind:color
+		bind:iconColor
+		bind:bgColor
+		bind:bgColorOpacity
+		bind:linkColor
+		bind:useOriginalIconColor
+		onColorChange={handleColorChange}
+	/>
+	<IconBackgroundSettings
+		bind:iconBgEnabled
+		bind:iconBgColor
+		bind:iconBgPadding
+		bind:iconBgRadius
+		bind:iconBgBlur
+		bind:iconBgOpacity
+	/>
+	<ShadowSettings
+		bind:shadowTarget
+		{textShadow}
+		{iconShadow}
+		onUpdateShadow={updateShadow}
+	/>
+{/snippet}
+
+{#snippet exportSettings()}
+	<ExportSettings
+		bind:ratios
+		bind:exportConfig
+		{canvasWidth}
+		{canvasHeight}
+		{activeRatios}
+		onExport={doExport}
+	/>
+{/snippet}
 
 <div class="flex flex-col lg:flex-row gap-6 w-full">
 	<!-- 左侧：预览区域 -->
@@ -487,186 +582,38 @@
 
 	<!-- 右侧：控制面板 -->
 	<div class="w-full lg:flex-1">
-		<!-- 移动端使用 Tabs，桌面端并列显示 -->
-		<div class="lg:hidden">
+		{#if isDesktop}
+			<div class="grid grid-cols-3 gap-6">
+				<div class="space-y-6">
+					<h2 class="text-lg font-semibold mb-4">内容</h2>
+					{@render contentSettings()}
+				</div>
+				<div class="space-y-6">
+					<h2 class="text-lg font-semibold mb-4">样式</h2>
+					{@render styleSettings()}
+				</div>
+				<div class="space-y-6">
+					<h2 class="text-lg font-semibold mb-4">导出</h2>
+					{@render exportSettings()}
+				</div>
+			</div>
+		{:else}
 			<Tabs.Root value="content" class="w-full">
 				<Tabs.List class="grid w-full grid-cols-3">
 					<Tabs.Trigger value="content">内容</Tabs.Trigger>
 					<Tabs.Trigger value="style">样式</Tabs.Trigger>
 					<Tabs.Trigger value="export">导出</Tabs.Trigger>
 				</Tabs.List>
-
 				<Tabs.Content value="content" class="space-y-6 mt-6">
-					<TextSettings
-						bind:leftText
-						bind:rightText
-						bind:fontWeight
-						bind:customFontName
-						onFontUpload={handleFontUpload}
-						onSystemFontSelect={handleSystemFontSelect}
-						onRemoveFont={() => {
-							customFont = null;
-							customFontName = '';
-						}}
-					/>
-					<IconSettings
-						bind:showIcon
-						bind:localIcon
-						bind:searchQuery
-						bind:searchResults
-						bind:iconName
-						onLocalIconUpload={handleLocalIconUpload}
-						{onSearchInput}
-						onSelectIcon={selectIcon}
-					/>
-					<BackgroundSettings
-						bind:bgImage
-						bind:bgBlur
-						bind:bgOpacity
-						bind:isBgDragOver
-						onBgImageUpload={handleBgImageUpload}
-						onBgDragOver={handleBgDragOver}
-						onBgDragLeave={handleBgDragLeave}
-						onBgDrop={handleBgDrop}
-					/>
+					{@render contentSettings()}
 				</Tabs.Content>
-
 				<Tabs.Content value="style" class="space-y-6 mt-6">
-					<SizeSettings
-						bind:fontSize
-						bind:iconSize
-						bind:iconRadius
-						bind:gap
-						bind:linkScale
-						onFontSizeChange={handleFontSizeChange}
-						onIconSizeChange={handleIconSizeChange}
-					/>
-					<ColorSettings
-						bind:color
-						bind:iconColor
-						bind:bgColor
-						bind:bgColorOpacity
-						bind:linkColor
-						bind:useOriginalIconColor
-						onColorChange={handleColorChange}
-					/>
-					<IconBackgroundSettings
-						bind:iconBgEnabled
-						bind:iconBgColor
-						bind:iconBgPadding
-						bind:iconBgRadius
-						bind:iconBgBlur
-						bind:iconBgOpacity
-					/>
-					<ShadowSettings
-						bind:shadowTarget
-						{textShadow}
-						{iconShadow}
-						onUpdateShadow={updateShadow}
-					/>
+					{@render styleSettings()}
 				</Tabs.Content>
-
 				<Tabs.Content value="export" class="space-y-6 mt-6">
-					<ExportSettings
-						bind:ratios
-						bind:exportConfig
-						{canvasWidth}
-						{canvasHeight}
-						{activeRatios}
-						onExport={doExport}
-					/>
+					{@render exportSettings()}
 				</Tabs.Content>
 			</Tabs.Root>
-		</div>
-
-		<!-- 桌面端并列显示 -->
-		<div class="hidden lg:grid lg:grid-cols-3 gap-6">
-			<!-- 内容列 -->
-			<div class="space-y-6">
-				<h2 class="text-lg font-semibold mb-4">内容</h2>
-				<TextSettings
-					bind:leftText
-					bind:rightText
-					bind:fontWeight
-					bind:customFontName
-					onFontUpload={handleFontUpload}
-					onSystemFontSelect={handleSystemFontSelect}
-					onRemoveFont={() => {
-						customFont = null;
-						customFontName = '';
-					}}
-				/>
-				<IconSettings
-					bind:showIcon
-					bind:localIcon
-					bind:searchQuery
-					bind:searchResults
-					bind:iconName
-					onLocalIconUpload={handleLocalIconUpload}
-					{onSearchInput}
-					onSelectIcon={selectIcon}
-				/>
-				<BackgroundSettings
-					bind:bgImage
-					bind:bgBlur
-					bind:bgOpacity
-					bind:isBgDragOver
-					onBgImageUpload={handleBgImageUpload}
-					onBgDragOver={handleBgDragOver}
-					onBgDragLeave={handleBgDragLeave}
-					onBgDrop={handleBgDrop}
-				/>
-			</div>
-
-			<!-- 样式列 -->
-			<div class="space-y-6">
-				<h2 class="text-lg font-semibold mb-4">样式</h2>
-				<SizeSettings
-					bind:fontSize
-					bind:iconSize
-					bind:iconRadius
-					bind:gap
-					bind:linkScale
-					onFontSizeChange={handleFontSizeChange}
-					onIconSizeChange={handleIconSizeChange}
-				/>
-				<ColorSettings
-					bind:color
-					bind:iconColor
-					bind:bgColor
-					bind:bgColorOpacity
-					bind:linkColor
-					bind:useOriginalIconColor
-					onColorChange={handleColorChange}
-				/>
-				<IconBackgroundSettings
-					bind:iconBgEnabled
-					bind:iconBgColor
-					bind:iconBgPadding
-					bind:iconBgRadius
-					bind:iconBgBlur
-					bind:iconBgOpacity
-				/>
-				<ShadowSettings
-					bind:shadowTarget
-					{textShadow}
-					{iconShadow}
-					onUpdateShadow={updateShadow}
-				/>
-			</div>
-
-			<!-- 导出列 -->
-			<div class="space-y-6">
-				<h2 class="text-lg font-semibold mb-4">导出</h2>
-				<ExportSettings
-					bind:ratios
-					bind:exportConfig
-					{canvasWidth}
-					{canvasHeight}
-					{activeRatios}
-					onExport={doExport}
-				/>
-			</div>
-		</div>
+		{/if}
 	</div>
 </div>
