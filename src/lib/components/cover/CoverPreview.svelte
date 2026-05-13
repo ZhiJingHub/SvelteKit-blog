@@ -140,11 +140,11 @@
 			<div
 				xmlns="http://www.w3.org/1999/xhtml"
 				style="
-					width: 100%;
-					height: 100%;
-					display: flex;
-					align-items: center;
-					justify-content: center;
+					width: 100%; 
+					height: 100%; 
+					display: flex; 
+					align-items: center; 
+					justify-content: center; 
 					gap: {gap}px;
 					font-family: {customFontName || 'sans-serif'};
 					font-weight: {fontWeight};
@@ -152,8 +152,8 @@
 			>
 				<span
 					style="
-						font-size: {fontSize}px;
-						color: {color};
+						font-size: {fontSize}px; 
+						color: {color}; 
 						text-shadow: {textShadow.x}px {textShadow.y}px {textShadow.blur}px {hexToRgba(
 						textShadow.color,
 						textShadow.alpha
@@ -166,17 +166,15 @@
 				{#if showIcon && (iconSvg || localIcon)}
 					<div
 						style="
-							width: {iconSize + iconBgPadding * 2}px;
-							height: {iconSize + iconBgPadding * 2}px;
+							width: {iconSize + iconBgPadding * 2}px; 
+							height: {iconSize + iconBgPadding * 2}px; 
 							display: flex;
 							align-items: center;
 							justify-content: center;
 							background-color: {iconBgEnabled
 							? hexToRgba(iconBgColor, iconBgOpacity)
 							: 'transparent'};
-							backdrop-filter: {iconBgEnabled && iconBgBlur > 0
-							? `blur(${iconBgBlur}px)`
-							: 'none'};
+							backdrop-filter: {iconBgEnabled && iconBgBlur > 0 ? `blur(${iconBgBlur}px)` : 'none'};
 							-webkit-backdrop-filter: {iconBgEnabled && iconBgBlur > 0
 							? `blur(${iconBgBlur}px)`
 							: 'none'};
@@ -188,7 +186,7 @@
 								max-width: {iconSize}px;
 								max-height: {iconSize}px;
 								flex-shrink: 0;
-								color: {useOriginalIconColor ? 'inherit' : iconColor};
+								color: {useOriginalIconColor ? 'inherit' : iconColor}; 
 								filter: drop-shadow({iconShadow.x}px {iconShadow.y}px {iconShadow.blur}px {hexToRgba(
 								iconShadow.color,
 								iconShadow.alpha
@@ -217,8 +215,8 @@
 
 				<span
 					style="
-						font-size: {fontSize}px;
-						color: {color};
+						font-size: {fontSize}px; 
+						color: {color}; 
 						text-shadow: {textShadow.x}px {textShadow.y}px {textShadow.blur}px {hexToRgba(
 						textShadow.color,
 						textShadow.alpha

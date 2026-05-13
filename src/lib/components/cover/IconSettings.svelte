@@ -11,7 +11,6 @@
 		searchQuery = $bindable(),
 		searchResults = $bindable(),
 		iconName = $bindable(),
-		isSearching,
 		onLocalIconUpload,
 		onSearchInput,
 		onSelectIcon
@@ -21,7 +20,6 @@
 		searchQuery: string;
 		searchResults: string[];
 		iconName: string;
-		isSearching: boolean;
 		onLocalIconUpload: (e: Event) => void;
 		onSearchInput: (e: Event) => void;
 		onSelectIcon: (icon: string) => void;
@@ -41,35 +39,54 @@
 	<CardContent class="space-y-4">
 		<div class="grid grid-cols-2 gap-2">
 			<div>
-				<input type="file" accept="image/*" onchange={onLocalIconUpload} class="hidden" id="icon-upload" />
-				<Label for="icon-upload" class="flex items-center justify-center h-10 border-2 border-dashed rounded-lg cursor-pointer hover:border-primary">
+				<input
+					type="file"
+					accept="image/*"
+					onchange={onLocalIconUpload}
+					class="hidden"
+					id="icon-upload"
+				/>
+				<Label
+					for="icon-upload"
+					class="flex items-center justify-center h-10 border-2 border-dashed rounded-lg cursor-pointer hover:border-primary"
+				>
 					<Icon icon="mdi:image" class="mr-2 h-4 w-4" />
 					<span class="text-xs">{localIcon ? '更换图片' : '上传图标'}</span>
 				</Label>
 			</div>
-			<Input value={searchQuery} oninput={onSearchInput} placeholder="搜索图标库..." class="h-10" />
+			<Input
+				value={searchQuery}
+				oninput={onSearchInput}
+				placeholder="搜索图标�?.."
+				class="h-10"
+			/>
 		</div>
 
-		{#if isSearching}
-			<div class="text-xs text-muted-foreground text-center py-4">搜索中...</div>
-		{:else if searchQuery && searchResults.length === 0}
-			<div class="text-xs text-muted-foreground text-center py-4">未找到匹配图标</div>
-		{:else if searchResults.length > 0}
+		{#if searchResults.length > 0}
 			<div class="max-h-48 overflow-y-auto border rounded-lg p-2">
 				<div class="grid gap-2" style="grid-template-columns: repeat(auto-fit, minmax(48px, 1fr));">
 					{#each searchResults as icon}
 						<button
 							onclick={() => onSelectIcon(icon)}
-							class="aspect-square flex items-center justify-center p-1.5 rounded-md border hover:bg-accent transition-colors {icon === iconName ? 'border-primary bg-primary/10' : 'border-input'}"
+							class="aspect-square flex items-center justify-center p-1.5 rounded-md border hover:bg-accent transition-colors {icon ===
+							iconName
+								? 'border-primary bg-primary/10'
+								: 'border-input'}"
 							title={icon}
 						>
-							<img src={`https://api.iconify.design/${icon.split(':')[0]}/${icon.split(':')[1]}.svg`} class="w-full h-full" alt={icon} />
+							<img
+								src={`https://api.iconify.design/${icon.split(':')[0]}/${icon.split(':')[1]}.svg`}
+								class="w-full h-full"
+								alt={icon}
+							/>
 						</button>
 					{/each}
 				</div>
 			</div>
 		{/if}
 
-		<div class="text-xs text-muted-foreground">当前: {iconName}</div>
+		<div class="text-xs text-muted-foreground">
+			当前: {iconName}
+		</div>
 	</CardContent>
 </Card>

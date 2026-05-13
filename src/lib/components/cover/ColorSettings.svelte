@@ -14,8 +14,12 @@
 		useOriginalIconColor = $bindable(),
 		onColorChange
 	}: {
-		color: string; iconColor: string; bgColor: string; bgColorOpacity: number;
-		linkColor: boolean; useOriginalIconColor: boolean;
+		color: string;
+		iconColor: string;
+		bgColor: string;
+		bgColorOpacity: number;
+		linkColor: boolean;
+		useOriginalIconColor: boolean;
 		onColorChange: (newColor: string, type: 'text' | 'icon') => void;
 	} = $props();
 </script>
@@ -40,27 +44,58 @@
 		<div class="flex items-center justify-between">
 			<Label>文字颜色</Label>
 			<div class="flex items-center gap-2">
-				<Input type="text" value={color} oninput={(e) => onColorChange(e.currentTarget.value, 'text')} class="w-24 h-8 text-xs" />
-				<input type="color" value={color} oninput={(e) => onColorChange(e.currentTarget.value, 'text')} class="w-8 h-8 rounded cursor-pointer" />
+				<Input
+					type="text"
+					value={color}
+					oninput={(e) => onColorChange(e.currentTarget.value, 'text')}
+					class="w-24 h-8 text-xs"
+				/>
+				<input
+					type="color"
+					value={color}
+					oninput={(e) => onColorChange(e.currentTarget.value, 'text')}
+					class="w-8 h-8 rounded cursor-pointer"
+				/>
 			</div>
 		</div>
+
 		<div class="flex items-center justify-between">
 			<Label>图标颜色</Label>
 			<div class="flex items-center gap-2">
-				<Input type="text" value={iconColor} disabled={useOriginalIconColor} oninput={(e) => onColorChange(e.currentTarget.value, 'icon')} class="w-24 h-8 text-xs" />
-				<input type="color" value={iconColor} disabled={useOriginalIconColor} oninput={(e) => onColorChange(e.currentTarget.value, 'icon')} class="w-8 h-8 rounded cursor-pointer" />
+				<Input
+					type="text"
+					value={iconColor}
+					disabled={useOriginalIconColor}
+					oninput={(e) => onColorChange(e.currentTarget.value, 'icon')}
+					class="w-24 h-8 text-xs"
+				/>
+				<input
+					type="color"
+					value={iconColor}
+					disabled={useOriginalIconColor}
+					oninput={(e) => onColorChange(e.currentTarget.value, 'icon')}
+					class="w-8 h-8 rounded cursor-pointer"
+				/>
 			</div>
 		</div>
+
 		<div class="flex items-center justify-between">
 			<Label>背景颜色</Label>
 			<div class="flex items-center gap-2">
-				<Input type="text" value={bgColor} class="w-24 h-8 text-xs" />
-				<input type="color" value={bgColor} oninput={(e) => (bgColor = e.currentTarget.value)} class="w-8 h-8 rounded cursor-pointer" />
+				<Input type="text" bind:value={bgColor} class="w-24 h-8 text-xs" />
+				<input type="color" bind:value={bgColor} class="w-8 h-8 rounded cursor-pointer" />
 			</div>
 		</div>
+
 		<div class="space-y-2">
-			<Label>背景不透明度: {Math.round(bgColorOpacity * 100)}%</Label>
-			<Slider value={[bgColorOpacity]} onValueChange={(v: number[]) => (bgColorOpacity = v[0])} min={0} max={1} step={0.01} />
+			<Label>背景不透明�? {Math.round(bgColorOpacity * 100)}%</Label>
+			<Slider
+				value={[bgColorOpacity]}
+				onValueChange={(v: number[]) => (bgColorOpacity = v[0])}
+				min={0}
+				max={1}
+				step={0.01}
+			/>
 		</div>
 	</CardContent>
 </Card>

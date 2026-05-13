@@ -5,11 +5,21 @@
 	import { Slider } from '$lib/components/ui/slider';
 
 	let {
-		fontSize = $bindable(), iconSize = $bindable(), iconRadius = $bindable(), gap = $bindable(), linkScale = $bindable(),
-		onFontSizeChange, onIconSizeChange
+		fontSize = $bindable(),
+		iconSize = $bindable(),
+		iconRadius = $bindable(),
+		gap = $bindable(),
+		linkScale = $bindable(),
+		onFontSizeChange,
+		onIconSizeChange
 	}: {
-		fontSize: number; iconSize: number; iconRadius: number; gap: number; linkScale: boolean;
-		onFontSizeChange: (value: number[]) => void; onIconSizeChange: (value: number[]) => void;
+		fontSize: number;
+		iconSize: number;
+		iconRadius: number;
+		gap: number;
+		linkScale: boolean;
+		onFontSizeChange: (value: number[]) => void;
+		onIconSizeChange: (value: number[]) => void;
 	} = $props();
 </script>
 
@@ -24,9 +34,29 @@
 		</CardTitle>
 	</CardHeader>
 	<CardContent class="space-y-4">
-		<div class="space-y-2"><Label>字体大小: {fontSize}px</Label><Slider value={[fontSize]} onValueChange={onFontSizeChange} min={20} max={700} /></div>
-		<div class="space-y-2"><Label>图标大小: {iconSize}px</Label><Slider value={[iconSize]} onValueChange={onIconSizeChange} min={20} max={700} /></div>
-		<div class="space-y-2"><Label>图标圆角: {iconRadius}%</Label><Slider value={[iconRadius]} onValueChange={(v: number[]) => (iconRadius = v[0])} min={0} max={50} /></div>
-		<div class="space-y-2"><Label>间距: {gap}px</Label><Slider value={[gap]} onValueChange={(v: number[]) => (gap = v[0])} min={0} max={200} /></div>
+		<div class="space-y-2">
+			<Label>字体大小: {fontSize}px</Label>
+			<Slider value={[fontSize]} onValueChange={onFontSizeChange} min={20} max={700} />
+		</div>
+
+		<div class="space-y-2">
+			<Label>图标大小: {iconSize}px</Label>
+			<Slider value={[iconSize]} onValueChange={onIconSizeChange} min={20} max={700} />
+		</div>
+
+		<div class="space-y-2">
+			<Label>图标圆角: {iconRadius}%</Label>
+			<Slider
+				value={[iconRadius]}
+				onValueChange={(v: number[]) => (iconRadius = v[0])}
+				min={0}
+				max={50}
+			/>
+		</div>
+
+		<div class="space-y-2">
+			<Label>间距: {gap}px</Label>
+			<Slider value={[gap]} onValueChange={(v: number[]) => (gap = v[0])} min={0} max={200} />
+		</div>
 	</CardContent>
 </Card>
