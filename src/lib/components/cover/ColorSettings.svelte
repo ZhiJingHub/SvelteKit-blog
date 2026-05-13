@@ -88,7 +88,7 @@
 		</div>
 
 		<div class="space-y-2">
-			<Label>背景不透明�? {Math.round(bgColorOpacity * 100)}%</Label>
+			<Label>背景不透明度: {Math.round(bgColorOpacity * 100)}%</Label>
 			<Slider
 				value={[bgColorOpacity]}
 				onValueChange={(v: number[]) => (bgColorOpacity = v[0])}

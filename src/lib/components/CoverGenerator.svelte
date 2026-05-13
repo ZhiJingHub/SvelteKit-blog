@@ -91,7 +91,7 @@
 	});
 
 	// Canvas 引用
-	let svgContainer: SVGSVGElement;
+	let svgContainer = $state<SVGSVGElement>();
 
 	// 拖拽状态
 	let dragStartX = 0;

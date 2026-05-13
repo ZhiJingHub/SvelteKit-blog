@@ -43,7 +43,7 @@
 		onPointerUp,
 		onWheel
 	}: {
-		svgContainer: SVGSVGElement;
+		svgContainer: SVGSVGElement | undefined;
 		canvasWidth: number;
 		canvasHeight: number;
 		visualRatios: Ratio[];

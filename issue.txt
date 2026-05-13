@@ -1,3 +1,30 @@
+请帮我修复项目中的两个主要问题：
+1. Svelte 组件中因为中文字符 UTF-8 编码损坏导致的 Vite 构建失败问题，以及 Svelte 5 的响应式警告。
+2. GitHub Actions 工作流 `friend-link.yml` 运行报错（YAML 语法错误，以及原脚本存在特殊的单引号注入风险与 EOF 缩进冲突）。
+
+### 任务一：修复 Svelte 文件中的乱码和警告
+请修改以下四个文件：
+
+1. 在 `src/lib/components/cover/ColorSettings.svelte` 文件中：
+   - 搜索 `<Label>背景不透明º?`，将其替换为 `<Label>背景不透明度: `
+
+2. 在 `src/lib/components/cover/IconBackgroundSettings.svelte` 文件中：
+   - 搜索 `<Label>内边·?`，将其替换为 `<Label>内边距: `
+   - 搜索 `<Label>不透明º?`，将其替换为 `<Label>不透明度: `
+
+3. 在 `src/lib/components/cover/IconSettings.svelte` 文件中：
+   - 搜索 `placeholder="搜索图标º?.."`，将其替换为 `placeholder="搜索图标..."`
+
+4. 在 `src/lib/components/CoverGenerator.svelte` 文件中：
+   - 搜索 `let svgContainer: SVGSVGElement;`
+   - 将其修改为 `let svgContainer: SVGSVGElement = $state();`
+
+修改完成后，请确保这些文件以标准的 UTF-8 格式保存。
+
+### 任务二：重构 GitHub Actions 友链自动审核工作流
+请将 `.github/workflows/friend-link.yml` 文件的全部内容替换为以下代码。这个新版本通过环境变量安全传递参数（防止 Issue 描述中包含单引号导致 JS 报错），并使用 `jq` 替代 `<<EOF` 来安全生成 JSON 以避免 YAML 缩进错误：
+
+```yaml
 name: 友链自动审核
 
 on:
@@ -90,7 +117,7 @@ jobs:
           script: |
             // 使用环境变量读取以防止用户输入单引号破坏脚本结构
             const applicantUrl = process.env.APPLICANT_URL;
-            const ourUrl = 'https://iwexe.top';
+            const ourUrl = '[https://iwexe.top](https://iwexe.top)';
 
             core.info(`检查 ${applicantUrl} 是否包含 ${ourUrl} 的反链...`);
 
@@ -174,7 +201,7 @@ jobs:
             if (exists) {
               body = `⏭️ **${name}** 的友链已存在，无需重复添加。`;
             } else if (!hasBacklink) {
-              body = `## ❌ 友链申请未通过\n\n**原因：** 未在你的站点 **${url}** 中找到本站 **https://iwexe.top** 的反向链接。\n\n请先在 \`<a href="https://iwexe.top" target="_blank">致靖的博客</a>\` 添加到你的友链列表中，然后重新提交 Issue。`;
+              body = `## ❌ 友链申请未通过\n\n**原因：** 未在你的站点 **${url}** 中找到本站 **https://iwexe.top** 的反向链接。\n\n请先在 \`<a href="[https://iwexe.top](https://iwexe.top)" target="_blank">致靖的博客</a>\` 添加到你的友链列表中，然后重新提交 Issue。`;
             } else {
               body = `## ✅ 友链申请已通过\n\n**${name}** 已成功添加到友链页面 🎉\n\n- 地址：${url}\n- 反链验证：✅ 已确认\n\n稍后可在 [友链页面](https://iwexe.top/friends) 查看。`;
             }
@@ -195,3 +222,8 @@ jobs:
                 state_reason: hasBacklink ? 'completed' : 'not_planned'
               });
             }
+```\n```
+
+***
+
+**说明**：把上面框里的内容原封不动地扔给你的 AI IDE 即可，它会自动定位文件并生成 diff 供你 Apply（应用）。

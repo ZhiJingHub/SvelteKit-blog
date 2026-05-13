@@ -44,7 +44,7 @@
 
 				<div class="grid grid-cols-2 gap-4">
 					<div class="space-y-2">
-						<Label>内边�? {iconBgPadding}px</Label>
+						<Label>内边距: {iconBgPadding}px</Label>
 						<Slider
 							value={[iconBgPadding]}
 							onValueChange={(v: number[]) => (iconBgPadding = v[0])}
@@ -74,7 +74,7 @@
 					</div>
 
 					<div class="space-y-2">
-						<Label>不透明�? {Math.round(iconBgOpacity * 100)}%</Label>
+						<Label>不透明度: {Math.round(iconBgOpacity * 100)}%</Label>
 						<Slider
 							value={[iconBgOpacity]}
 							onValueChange={(v: number[]) => (iconBgOpacity = v[0])}

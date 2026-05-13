@@ -57,7 +57,7 @@
 			<Input
 				value={searchQuery}
 				oninput={onSearchInput}
-				placeholder="搜索图标�?.."
+				placeholder="搜索图标..."
 				class="h-10"
 			/>
 		</div>
