@@ -33,11 +33,13 @@
 	let searchResults = $state<string[]>([]);
 	let isSearching = $state(false);
 	let searchDebounce: ReturnType<typeof setTimeout>;
+	let activeTab = $state('content');
 
 	// 字体状态
 	let fontSize = $state(64);
 	let customFont = $state<string | null>(null);
 	let customFontName = $state('');
+	let customFontData = $state<string | null>(null);
 
 	// 间距
 	let gap = $state(20);
@@ -189,10 +191,16 @@
 			if (customFont) URL.revokeObjectURL(customFont);
 			const reader = new FileReader();
 			reader.onload = (e) => {
-				const fontData = e.target?.result as ArrayBuffer;
-				customFontName = file.name.replace(/\.[^/.]+$/, '');
-				customFont = URL.createObjectURL(new Blob([fontData]));
-				const fontFace = new FontFace(customFontName, `url(${customFont})`);
+			const fontData = e.target?.result as ArrayBuffer;
+			customFontName = file.name.replace(/\.[^/.]+$/, '');
+			customFont = URL.createObjectURL(new Blob([fontData]));
+			const bytes = new Uint8Array(fontData);
+			let binary = '';
+			for (let i = 0; i < bytes.length; i++) {
+				binary += String.fromCharCode(bytes[i]);
+			}
+			customFontData = `data:${file.type || 'application/octet-stream'};base64,${btoa(binary)}`;
+			const fontFace = new FontFace(customFontName, `url(${customFont})`);
 				fontFace.load().then((loadedFace) => {
 					document.fonts.add(loadedFace);
 				});
@@ -341,7 +349,13 @@
 
 		const svgClone = svgContainer.cloneNode(true) as SVGSVGElement;
 
-		const ratiosToExport =
+	if (customFontData) {
+		const style = document.createElementNS('http://www.w3.org/2000/svg', 'style');
+		style.textContent = `@font-face { font-family: '${customFontName}'; src: url(${customFontData}); }`;
+		svgClone.insertBefore(style, svgClone.firstChild);
+	}
+
+	const ratiosToExport =
 			exportConfig.exportRatios.length > 0
 				? ratios.filter((r) => exportConfig.exportRatios.includes(r.label))
 				: activeRatios;
@@ -368,13 +382,12 @@
 				downloadLink(url, `${ratioFilename}.svg`);
 				setTimeout(() => URL.revokeObjectURL(url), 1000);
 			} else {
-				const img = new Image();
-				const bytes = new TextEncoder().encode(svgData);
-				const binary = Array.from(bytes, (b) => String.fromCharCode(b)).join('');
-				img.src = `data:image/svg+xml;base64,${btoa(binary)}`;
-				await new Promise<void>((resolve) => {
-					img.onload = () => resolve();
-				});
+			const img = new Image();
+			img.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgData)}`;
+			await new Promise<void>((resolve, reject) => {
+				img.onload = () => resolve();
+				img.onerror = () => reject(new Error('Image export failed'));
+			});
 
 				const scales = exportConfig.scales.length > 0 ? exportConfig.scales : [1];
 				for (const scale of scales) {
@@ -415,8 +428,8 @@
 				})
 				.then((svg) => {
 					let processedSvg = svg
-						.replace(/width="[^"]*"/g, '')
-						.replace(/height="[^"]*"/g, '');
+					.replace(/\s+width="[^"]*"/g, '')
+					.replace(/\s+height="[^"]*"/g, '');
 					processedSvg = processedSvg.replace(
 						/<svg\b([^>]*)>/,
 						'<svg$1 width="100%" height="100%" preserveAspectRatio="xMidYMid meet">'
@@ -459,9 +472,10 @@
 		onFontUpload={handleFontUpload}
 		onSystemFontSelect={handleSystemFontSelect}
 		onRemoveFont={() => {
-			customFont = null;
-			customFontName = '';
-		}}
+		customFont = null;
+		customFontName = '';
+		customFontData = null;
+	}}
 	/>
 	<IconSettings
 		bind:showIcon
@@ -598,7 +612,7 @@
 				</div>
 			</div>
 		{:else}
-			<Tabs.Root value="content" class="w-full">
+			<Tabs.Root bind:value={activeTab} class="w-full">
 				<Tabs.List class="grid w-full grid-cols-3">
 					<Tabs.Trigger value="content">内容</Tabs.Trigger>
 					<Tabs.Trigger value="style">样式</Tabs.Trigger>
