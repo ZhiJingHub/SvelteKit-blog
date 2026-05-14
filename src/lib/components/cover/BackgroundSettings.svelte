@@ -67,7 +67,7 @@
 				</div>
 				<Slider value={[bgBlur]} onValueChange={(v: number[]) => (bgBlur = v[0])} min={0} max={20} />
 
-				<Label>不透明�? {Math.round(bgOpacity * 100)}%</Label>
+				<Label>不透明度: {Math.round(bgOpacity * 100)}%</Label>
 				<Slider
 					value={[bgOpacity]}
 					onValueChange={(v: number[]) => (bgOpacity = v[0])}

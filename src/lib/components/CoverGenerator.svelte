@@ -12,7 +12,7 @@
 	import ExportSettings from './cover/ExportSettings.svelte';
 
 	// 窗口响应式
-	let innerWidth = $state(0);
+	let innerWidth = $state(typeof window !== 'undefined' ? window.innerWidth : 1200);
 	let isDesktop = $derived(innerWidth >= 1024);
 
 	// 文本状态

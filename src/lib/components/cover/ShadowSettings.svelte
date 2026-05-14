@@ -94,7 +94,7 @@
 
 		<div class="space-y-2">
 			<Label
-				>不透明�? {Math.round(
+				>不透明度: {Math.round(
 					(shadowTarget === 'icon' ? iconShadow.alpha : textShadow.alpha) * 100
 				)}%</Label
 			>
