@@ -17,7 +17,7 @@ export const GET: RequestHandler = () => {
 		image: `${siteConfig.url}${siteConfig.ogImage}`,
 		favicon: `${siteConfig.url}${siteConfig.icon}`,
 		copyright: `All rights reserved ${new Date().getFullYear()}, ${siteConfig.author.name}`,
-		updated: new Date(posts[0]?.metadata.published || new Date()),
+		updated: new Date(posts[0]?.metadata.date || posts[0]?.metadata.published || new Date()),
 		feedLinks: {
 			rss2: `${siteConfig.url}/rss.xml`
 		},
@@ -33,7 +33,7 @@ export const GET: RequestHandler = () => {
 			id: `${siteConfig.url}/posts/${post.slug}/`,
 			link: `${siteConfig.url}/posts/${post.slug}/`,
 			description: post.metadata.description,
-			date: new Date(post.metadata.published),
+			date: new Date(post.metadata.date || post.metadata.published),
 			image: post.metadata.image
 				? post.metadata.image.startsWith('http')
 					? post.metadata.image

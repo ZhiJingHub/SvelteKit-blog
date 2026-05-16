@@ -14,7 +14,7 @@ export const GET: RequestHandler = () => {
 
 	for (const post of posts) {
 		urls.push(
-			`<url><loc>${siteConfig.url}/posts/${post.slug}/</loc><lastmod>${post.metadata.updated || post.metadata.published}</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>`
+			`<url><loc>${siteConfig.url}/posts/${post.slug}/</loc><lastmod>${post.metadata.updated || post.metadata.date || post.metadata.published}</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>`
 		);
 	}
 

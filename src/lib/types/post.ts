@@ -6,6 +6,7 @@ export interface PostMetadata {
 	description: string;
 	draft?: boolean;
 	updated?: string;
+	date?: string;
 }
 
 export interface Post {

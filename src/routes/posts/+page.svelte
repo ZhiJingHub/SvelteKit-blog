@@ -250,7 +250,7 @@
 										<Badge class="shrink-0">置顶</Badge>
 									{/if}
 									<time class="shrink-0 text-sm text-muted-foreground">
-										{formatDate(post.metadata.published)}
+										{formatDate(post.metadata.date || post.metadata.published)}
 									</time>
 									<span class="shrink-0 text-sm text-muted-foreground">· {post.stats.wordCount.toLocaleString()} 字</span>
 									<span class="shrink-0 text-sm text-muted-foreground">· 约 {post.stats.readTime} 分钟</span>

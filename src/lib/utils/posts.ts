@@ -22,7 +22,7 @@ export function getAllPosts(): Post[] {
 	return posts.sort((a, b) => {
 		if (a.metadata.pinned && !b.metadata.pinned) return -1;
 		if (!a.metadata.pinned && b.metadata.pinned) return 1;
-		return new Date(b.metadata.published).getTime() - new Date(a.metadata.published).getTime();
+		return new Date(b.metadata.date || b.metadata.published).getTime() - new Date(a.metadata.date || a.metadata.published).getTime();
 	});
 }
 

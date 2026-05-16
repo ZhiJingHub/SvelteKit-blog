@@ -157,7 +157,7 @@
 				<Badge>置顶</Badge>
 			{/if}
 			<time class="text-xs sm:text-sm text-muted-foreground">
-				{formatDate(data.post.metadata.published)}
+				{formatDate(data.post.metadata.date || data.post.metadata.published)}
 			</time>
 			<span class="text-xs sm:text-sm text-muted-foreground">· {data.stats.wordCount.toLocaleString()} 字</span>
 			<span class="text-xs sm:text-sm text-muted-foreground">· 约 {data.stats.readTime} 分钟</span>
