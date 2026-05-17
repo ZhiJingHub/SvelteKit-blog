@@ -9,8 +9,9 @@
 </svelte:head>
 
 <div class="container mx-auto max-w-7xl px-4 py-8">
-	<CoverGenerator />
-	<div class="mt-4 text-center text-sm text-muted-foreground">
-		<PageViews pathname="/cover/" />
+	<div class="mb-6 flex items-center justify-between">
+		<h1 class="text-2xl font-bold">封面制作</h1>
+		<PageViews pathname="/cover/" class="text-sm text-muted-foreground" />
 	</div>
+	<CoverGenerator />
 </div>

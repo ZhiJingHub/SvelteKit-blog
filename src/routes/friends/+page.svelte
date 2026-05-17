@@ -21,7 +21,11 @@
 <div class="container mx-auto max-w-6xl px-4 py-12">
 	<div class="mb-8 text-center">
 		<h1 class="mb-4 text-4xl font-bold">友情链接</h1>
-		<p class="text-lg text-muted-foreground">这里是我的朋友们，欢迎互相访问交流</p>
+		<p class="text-lg text-muted-foreground">
+			这里是我的朋友们，欢迎互相访问交流
+			<span class="mx-2 text-muted-foreground/40">·</span>
+			<PageViews pathname="/friends/" class="text-base" prefix="" suffix=" 次浏览" />
+		</p>
 	</div>
 
 	<div class="mb-8">
@@ -113,8 +117,5 @@
 				</div>
 			{/if}
 		{/if}
-	</div>
-	<div class="mt-6 text-center text-sm text-muted-foreground">
-		<PageViews pathname="/friends/" />
 	</div>
 </div>

@@ -162,6 +162,7 @@
 					<Icon icon="mdi:layers-triple" class="size-6 text-primary" />
 					光棱坦克 / 幻影坦克
 				</CardTitle>
+				<PageViews pathname="/ptg/" class="text-sm text-muted-foreground" />
 			</div>
 		</CardHeader>
 		<CardContent>
@@ -288,8 +289,5 @@
 				</CardContent>
 			</Card>
 		</section>
-	</div>
-	<div class="mt-6 text-center text-sm text-muted-foreground">
-		<PageViews pathname="/ptg/" />
 	</div>
 </div>
