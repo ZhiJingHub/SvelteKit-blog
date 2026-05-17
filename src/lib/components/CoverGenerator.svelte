@@ -498,50 +498,52 @@
 
 <svelte:window bind:innerWidth />
 
-<div class="space-y-8">
-	<CoverPreview
-		bind:svgContainer
-		{canvasWidth}
-		{canvasHeight}
-		{visualRatios}
-		{bgImage}
-		{bgImageX}
-		{bgImageY}
-		{bgImageScale}
-		{bgBlur}
-		{bgOpacity}
-		{bgColor}
-		{bgColorOpacity}
-		{leftText}
-		{rightText}
-		{fontSize}
-		{fontWeight}
-		{customFontName}
-		{color}
-		{textShadow}
-		{gap}
-		{showIcon}
-		{iconSvg}
-		{localIcon}
-		{iconSize}
-		{iconBgPadding}
-		{iconBgEnabled}
-		{iconBgColor}
-		{iconBgOpacity}
-		{iconBgBlur}
-		{iconBgRadius}
-		{useOriginalIconColor}
-		{iconColor}
-		{iconShadow}
-		{iconRadius}
-		{isDragging}
-		onPointerDown={handlePointerDown}
-		onPointerMove={handlePointerMove}
-		onPointerUp={handlePointerUp}
-		onWheel={handleWheel}
-	/>
+<div class="flex flex-col lg:flex-row gap-6">
+	<div class="lg:flex-1 lg:sticky lg:top-6 lg:self-start">
+		<CoverPreview
+			bind:svgContainer
+			{canvasWidth}
+			{canvasHeight}
+			{visualRatios}
+			{bgImage}
+			{bgImageX}
+			{bgImageY}
+			{bgImageScale}
+			{bgBlur}
+			{bgOpacity}
+			{bgColor}
+			{bgColorOpacity}
+			{leftText}
+			{rightText}
+			{fontSize}
+			{fontWeight}
+			{customFontName}
+			{color}
+			{textShadow}
+			{gap}
+			{showIcon}
+			{iconSvg}
+			{localIcon}
+			{iconSize}
+			{iconBgPadding}
+			{iconBgEnabled}
+			{iconBgColor}
+			{iconBgOpacity}
+			{iconBgBlur}
+			{iconBgRadius}
+			{useOriginalIconColor}
+			{iconColor}
+			{iconShadow}
+			{iconRadius}
+			{isDragging}
+			onPointerDown={handlePointerDown}
+			onPointerMove={handlePointerMove}
+			onPointerUp={handlePointerUp}
+			onWheel={handleWheel}
+		/>
+	</div>
 
-	<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+	<div class="lg:w-[420px] xl:w-[480px] space-y-4">
 		<TextSettings
 			bind:leftText
 			bind:rightText
