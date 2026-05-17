@@ -14,8 +14,8 @@
 	let innerWidth = $state(0);
 	let isDesktop = $derived(innerWidth >= 1024);
 
-	let leftText = $state('鸣潮');
-	let rightText = $state('牛逼');
+	let leftText = $state('左侧文字');
+	let rightText = $state('右侧文字');
 	let fontWeight = $state(400);
 
 	let iconName = $state('arcticons:wuthering-waves');

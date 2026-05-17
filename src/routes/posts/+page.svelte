@@ -7,6 +7,7 @@
 	import Icon from '@iconify/svelte';
 	import { siteConfig } from '$lib/config/site';
 	import { spaCache } from '$lib/utils/spaCache';
+	import PageViews from '$lib/components/PageViews.svelte';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
@@ -254,6 +255,7 @@
 									</time>
 									<span class="shrink-0 text-sm text-muted-foreground">· {post.stats.wordCount.toLocaleString()} 字</span>
 									<span class="shrink-0 text-sm text-muted-foreground">· 约 {post.stats.readTime} 分钟</span>
+									<PageViews pathname="/posts/{post.slug}/" class="shrink-0 text-sm text-muted-foreground" prefix="· " increment={false} />
 								</div>
 
 								<h2 class="mb-2 text-xl sm:text-2xl font-semibold group-hover:text-primary break-words">
