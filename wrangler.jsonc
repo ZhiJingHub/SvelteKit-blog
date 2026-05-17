@@ -9,11 +9,5 @@
 		"directory": ".svelte-kit/cloudflare"
 	},
 	"workers_dev": true,
-	"preview_urls": true,
-	"kv_namespaces": [
-		{
-			"binding": "PAGEVIEWS",
-			"id": "KV_NAMESPACE_ID"
-		}
-	]
+	"preview_urls": true
 }
