@@ -9,7 +9,12 @@
 	import IconBackgroundSettings from './cover/IconBackgroundSettings.svelte';
 	import ShadowSettings from './cover/ShadowSettings.svelte';
 	import ExportSettings from './cover/ExportSettings.svelte';
-	import { hexToRgba } from '$lib/utils/color';
+	import Root from '$lib/components/ui/tabs/tabs.svelte';
+	import TabsList from '$lib/components/ui/tabs/tabs-list.svelte';
+	import TabsTrigger from '$lib/components/ui/tabs/tabs-trigger.svelte';
+	import TabsContent from '$lib/components/ui/tabs/tabs-content.svelte';
+	import { Button } from '$lib/components/ui/button';
+	import Icon from '@iconify/svelte';
 
 	let innerWidth = $state(0);
 
@@ -331,8 +336,6 @@
 		if (exportConfig.transparentBg) {
 			const bgRects = svgClone.querySelectorAll('.bg-fill');
 			for (const r of bgRects) r.remove();
-			const checkerboard = svgClone.querySelector('#checkerboard');
-			if (checkerboard?.parentElement) checkerboard.parentElement.remove();
 		}
 
 		const fontBase64 = getFontDataBase64();
@@ -355,7 +358,6 @@
 					});
 					imgEl.setAttribute('href', dataUrl);
 				} catch {
-					// keep original
 				}
 			}
 		}
@@ -373,7 +375,6 @@
 					});
 					localImgEl.setAttribute('src', dataUrl);
 				} catch {
-					// keep original
 				}
 			}
 		}
@@ -498,8 +499,8 @@
 
 <svelte:window bind:innerWidth />
 
-<div class="flex flex-col lg:flex-row gap-6">
-	<div class="lg:flex-1 lg:sticky lg:top-6 lg:self-start">
+<div class="cover-layout">
+	<div class="cover-preview-col">
 		<CoverPreview
 			bind:svgContainer
 			{canvasWidth}
@@ -541,83 +542,239 @@
 			onPointerUp={handlePointerUp}
 			onWheel={handleWheel}
 		/>
+
+		<div class="export-bar">
+			<Button onclick={doExport} disabled={activeRatios.length === 0} class="flex-1" size="lg">
+				<Icon icon="mdi:download" class="mr-2 h-5 w-5" />
+				导出图片
+			</Button>
+			<ExportSettings
+				bind:ratios
+				bind:exportConfig
+				{canvasWidth}
+				{canvasHeight}
+				{activeRatios}
+				onExport={doExport}
+			/>
+		</div>
 	</div>
 
-	<div class="lg:w-[420px] xl:w-[480px] space-y-4">
-		<TextSettings
-			bind:leftText
-			bind:rightText
-			bind:fontWeight
-			bind:customFontName
-			onFontUpload={handleFontUpload}
-			onSystemFontSelect={handleSystemFontSelect}
-			onRemoveFont={() => {
-				if (customFont) URL.revokeObjectURL(customFont);
-				customFont = null;
-				customFontName = '';
-				fontArrayBuffer = null;
-				fontMimeType = '';
-			}}
-		/>
-		<IconSettings
-			bind:showIcon
-			bind:localIcon
-			bind:searchQuery
-			bind:searchResults
-			bind:iconName
-			onLocalIconUpload={handleLocalIconUpload}
-			{onSearchInput}
-			onSelectIcon={selectIcon}
-		/>
-		<BackgroundSettings
-			bind:bgImage
-			bind:bgBlur
-			bind:bgOpacity
-			bind:isBgDragOver
-			onBgImageUpload={handleBgImageUpload}
-			onBgDragOver={handleBgDragOver}
-			onBgDragLeave={handleBgDragLeave}
-			onBgDrop={handleBgDrop}
-		/>
-		<SizeSettings
-			bind:fontSize
-			bind:iconSize
-			bind:iconRadius
-			bind:gap
-			bind:linkScale
-			onFontSizeChange={handleFontSizeChange}
-			onIconSizeChange={handleIconSizeChange}
-		/>
-		<ColorSettings
-			bind:color
-			bind:iconColor
-			bind:bgColor
-			bind:bgColorOpacity
-			bind:linkColor
-			bind:useOriginalIconColor
-			onColorChange={handleColorChange}
-		/>
-		<IconBackgroundSettings
-			bind:iconBgEnabled
-			bind:iconBgColor
-			bind:iconBgPadding
-			bind:iconBgRadius
-			bind:iconBgBlur
-			bind:iconBgOpacity
-		/>
-		<ShadowSettings
-			bind:shadowTarget
-			{textShadow}
-			{iconShadow}
-			onUpdateShadow={updateShadow}
-		/>
-		<ExportSettings
-			bind:ratios
-			bind:exportConfig
-			{canvasWidth}
-			{canvasHeight}
-			{activeRatios}
-			onExport={doExport}
-		/>
+	<div class="cover-settings-col">
+		<Root value="text" class="w-full">
+			<TabsList class="w-full">
+				<TabsTrigger value="text">
+					<Icon icon="mdi:format-text" class="mr-1.5 h-4 w-4" />
+					文本
+				</TabsTrigger>
+				<TabsTrigger value="icon">
+					<Icon icon="mdi:image-outline" class="mr-1.5 h-4 w-4" />
+					图标
+				</TabsTrigger>
+				<TabsTrigger value="background">
+					<Icon icon="mdi:image-area" class="mr-1.5 h-4 w-4" />
+					背景
+				</TabsTrigger>
+				<TabsTrigger value="style">
+					<Icon icon="mdi:palette-outline" class="mr-1.5 h-4 w-4" />
+					样式
+				</TabsTrigger>
+				<TabsTrigger value="export">
+					<Icon icon="mdi:cog-outline" class="mr-1.5 h-4 w-4" />
+					导出
+				</TabsTrigger>
+			</TabsList>
+
+			<TabsContent value="text">
+				<TextSettings
+					bind:leftText
+					bind:rightText
+					bind:fontWeight
+					bind:customFontName
+					onFontUpload={handleFontUpload}
+					onSystemFontSelect={handleSystemFontSelect}
+					onRemoveFont={() => {
+						if (customFont) URL.revokeObjectURL(customFont);
+						customFont = null;
+						customFontName = '';
+						fontArrayBuffer = null;
+						fontMimeType = '';
+					}}
+				/>
+				<SizeSettings
+					bind:fontSize
+					bind:iconSize
+					bind:iconRadius
+					bind:gap
+					bind:linkScale
+					onFontSizeChange={handleFontSizeChange}
+					onIconSizeChange={handleIconSizeChange}
+				/>
+			</TabsContent>
+
+			<TabsContent value="icon">
+				<IconSettings
+					bind:showIcon
+					bind:localIcon
+					bind:searchQuery
+					bind:searchResults
+					bind:iconName
+					onLocalIconUpload={handleLocalIconUpload}
+					{onSearchInput}
+					onSelectIcon={selectIcon}
+				/>
+				<IconBackgroundSettings
+					bind:iconBgEnabled
+					bind:iconBgColor
+					bind:iconBgPadding
+					bind:iconBgRadius
+					bind:iconBgBlur
+					bind:iconBgOpacity
+				/>
+			</TabsContent>
+
+			<TabsContent value="background">
+				<BackgroundSettings
+					bind:bgImage
+					bind:bgBlur
+					bind:bgOpacity
+					bind:isBgDragOver
+					onBgImageUpload={handleBgImageUpload}
+					onBgDragOver={handleBgDragOver}
+					onBgDragLeave={handleBgDragLeave}
+					onBgDrop={handleBgDrop}
+				/>
+				<ColorSettings
+					bind:color
+					bind:iconColor
+					bind:bgColor
+					bind:bgColorOpacity
+					bind:linkColor
+					bind:useOriginalIconColor
+					onColorChange={handleColorChange}
+				/>
+			</TabsContent>
+
+			<TabsContent value="style">
+				<ShadowSettings
+					bind:shadowTarget
+					{textShadow}
+					{iconShadow}
+					onUpdateShadow={updateShadow}
+				/>
+			</TabsContent>
+
+			<TabsContent value="export">
+				<ExportSettings
+					bind:ratios
+					bind:exportConfig
+					{canvasWidth}
+					{canvasHeight}
+					{activeRatios}
+					onExport={doExport}
+				/>
+			</TabsContent>
+		</Root>
 	</div>
 </div>
+
+<style>
+	.cover-layout {
+		display: flex;
+		flex-direction: column;
+		gap: 1.5rem;
+	}
+
+	@media (min-width: 1024px) {
+		.cover-layout {
+			flex-direction: row;
+			gap: 1.5rem;
+			align-items: flex-start;
+		}
+
+		.cover-preview-col {
+			flex: 1;
+			position: sticky;
+			top: 1.5rem;
+		}
+
+		.cover-settings-col {
+			width: 420px;
+			flex-shrink: 0;
+			max-height: calc(100vh - 3rem);
+			overflow-y: auto;
+			padding-right: 0.25rem;
+		}
+	}
+
+	@media (min-width: 1280px) {
+		.cover-settings-col {
+			width: 480px;
+		}
+	}
+
+	.cover-preview-col {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+	}
+
+	.export-bar {
+		display: flex;
+		gap: 0.75rem;
+		align-items: center;
+	}
+
+	.cover-settings-col {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+	}
+
+	.cover-settings-col :global([data-slot="tabs-content"]) {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+		padding-top: 0.75rem;
+	}
+
+	.cover-settings-col :global([data-slot="tabs-list"]) {
+		flex-wrap: wrap;
+	}
+
+	.cover-settings-col :global([data-slot="card"]) {
+		padding: 0;
+		gap: 0;
+	}
+
+	.cover-settings-col :global([data-slot="card-header"]) {
+		padding: 0.75rem 1rem 0.25rem;
+	}
+
+	.cover-settings-col :global([data-slot="card-content"]) {
+		padding: 0.5rem 1rem 1rem;
+	}
+
+	.cover-settings-col :global([data-slot="card-title"]) {
+		font-size: 0.875rem;
+		font-weight: 600;
+	}
+
+	.cover-settings-col :global([data-slot="tabs-trigger"]) {
+		font-size: 0.8125rem;
+		gap: 0.25rem;
+		padding: 0.5rem 0.75rem;
+	}
+
+	.cover-settings-col::-webkit-scrollbar {
+		width: 4px;
+	}
+
+	.cover-settings-col::-webkit-scrollbar-track {
+		background: transparent;
+	}
+
+	.cover-settings-col::-webkit-scrollbar-thumb {
+		background: hsl(var(--border));
+		border-radius: 2px;
+	}
+</style>

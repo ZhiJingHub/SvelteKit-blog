@@ -89,7 +89,7 @@
 </script>
 
 <div
-	class="w-full overflow-hidden flex justify-center bg-card p-4 rounded-xl select-none touch-none"
+	class="preview-area select-none touch-none"
 	role="button"
 	tabindex="0"
 	onpointerdown={onPointerDown}
@@ -104,11 +104,7 @@
 		height={canvasHeight}
 		viewBox="0 0 {canvasWidth} {canvasHeight}"
 		xmlns="http://www.w3.org/2000/svg"
-		style="max-width: 100%; height: auto; cursor: {bgImage
-			? isDragging
-				? 'grabbing'
-				: 'grab'
-			: 'default'};"
+		style="cursor: {bgImage ? (isDragging ? 'grabbing' : 'grab') : 'default'};"
 		onwheel={onWheel}
 	>
 		<rect class="bg-fill" width="100%" height="100%" fill={hexToRgba(bgColor, bgColorOpacity)} />
@@ -127,23 +123,23 @@
 		{/if}
 
 		<foreignObject x="0" y="0" width={canvasWidth} height={canvasHeight} style="pointer-events: none;">
-		<div
-			xmlns="http://www.w3.org/1999/xhtml"
-			style="
-				width: {canvasWidth}px; 
-				height: {canvasHeight}px; 
-				display: flex; 
-				align-items: center; 
-				justify-content: center; 
-				gap: {gap}px;
-				font-family: {customFontName || 'sans-serif'};
-				font-weight: {fontWeight};
-			"
-		>
+			<div
+				xmlns="http://www.w3.org/1999/xhtml"
+				style="
+					width: {canvasWidth}px;
+					height: {canvasHeight}px;
+					display: flex;
+					align-items: center;
+					justify-content: center;
+					gap: {gap}px;
+					font-family: {customFontName || 'sans-serif'};
+					font-weight: {fontWeight};
+				"
+			>
 				<span
 					style="
-						font-size: {fontSize}px; 
-						color: {color}; 
+						font-size: {fontSize}px;
+						color: {color};
 						text-shadow: {textShadow.x}px {textShadow.y}px {textShadow.blur}px {hexToRgba(
 						textShadow.color,
 						textShadow.alpha
@@ -156,8 +152,8 @@
 				{#if showIcon && (iconSvg || localIcon)}
 					<div
 						style="
-							width: {iconSize + iconBgPadding * 2}px; 
-							height: {iconSize + iconBgPadding * 2}px; 
+							width: {iconSize + iconBgPadding * 2}px;
+							height: {iconSize + iconBgPadding * 2}px;
 							display: flex;
 							align-items: center;
 							justify-content: center;
@@ -176,7 +172,7 @@
 								max-width: {iconSize}px;
 								max-height: {iconSize}px;
 								flex-shrink: 0;
-								color: {useOriginalIconColor ? 'inherit' : iconColor}; 
+								color: {useOriginalIconColor ? 'inherit' : iconColor};
 								filter: drop-shadow({iconShadow.x}px {iconShadow.y}px {iconShadow.blur}px {hexToRgba(
 								iconShadow.color,
 								iconShadow.alpha
@@ -205,8 +201,8 @@
 
 				<span
 					style="
-						font-size: {fontSize}px; 
-						color: {color}; 
+						font-size: {fontSize}px;
+						color: {color};
 						text-shadow: {textShadow.x}px {textShadow.y}px {textShadow.blur}px {hexToRgba(
 						textShadow.color,
 						textShadow.alpha
@@ -224,7 +220,7 @@
 			width={canvasWidth}
 			height={canvasHeight}
 			fill="none"
-			stroke="rgba(255, 0, 0, 0.8)"
+			stroke="rgba(255,255,255,0.15)"
 			stroke-width="2"
 			class="canvas-border"
 		/>
@@ -238,15 +234,15 @@
 						width={BASE_HEIGHT * (ratio.w / ratio.h)}
 						height={BASE_HEIGHT}
 						fill="none"
-						stroke="rgba(255, 0, 0, 0.5)"
-						stroke-width="2"
-						stroke-dasharray="10 5"
+						stroke="rgba(255, 255, 255, 0.3)"
+						stroke-width="1"
+						stroke-dasharray="6 4"
 					/>
 					<text
-						x="{(canvasWidth - BASE_HEIGHT * (ratio.w / ratio.h)) / 2 + 10}"
-						y="30"
-						fill="rgba(255, 0, 0, 0.5)"
-						font-size="20"
+						x="{(canvasWidth - BASE_HEIGHT * (ratio.w / ratio.h)) / 2 + 8}"
+						y="22"
+						fill="rgba(255, 255, 255, 0.4)"
+						font-size="14"
 					>
 						{ratio.label}
 					</text>
@@ -257,6 +253,24 @@
 </div>
 
 <style>
+	.preview-area {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: #1a1a2e;
+		border-radius: 0.75rem;
+		padding: 1.5rem;
+		overflow: hidden;
+	}
+
+	.preview-area svg {
+		max-width: 100%;
+		max-height: 70vh;
+		height: auto;
+		border-radius: 0.25rem;
+		box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+	}
+
 	.icon-svg-box {
 		width: 100%;
 		height: 100%;
