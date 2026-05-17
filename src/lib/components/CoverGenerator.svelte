@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
-	import * as Tabs from '$lib/components/ui/tabs';
 	import CoverPreview from './cover/CoverPreview.svelte';
 	import TextSettings from './cover/TextSettings.svelte';
 	import IconSettings from './cover/IconSettings.svelte';
@@ -30,7 +29,6 @@
 	let searchResults = $state<string[]>([]);
 	let isSearching = $state(false);
 	let searchDebounce: ReturnType<typeof setTimeout>;
-	let activeTab = $state('content');
 
 	let fontSize = $state(64);
 	let customFont = $state<string | null>(null);
@@ -500,160 +498,124 @@
 
 <svelte:window bind:innerWidth />
 
-{#snippet contentSettings()}
-	<TextSettings
-		bind:leftText
-		bind:rightText
-		bind:fontWeight
-		bind:customFontName
-		onFontUpload={handleFontUpload}
-		onSystemFontSelect={handleSystemFontSelect}
-		onRemoveFont={() => {
-			if (customFont) URL.revokeObjectURL(customFont);
-			customFont = null;
-			customFontName = '';
-			fontArrayBuffer = null;
-			fontMimeType = '';
-		}}
-	/>
-	<IconSettings
-		bind:showIcon
-		bind:localIcon
-		bind:searchQuery
-		bind:searchResults
-		bind:iconName
-		onLocalIconUpload={handleLocalIconUpload}
-		{onSearchInput}
-		onSelectIcon={selectIcon}
-	/>
-	<BackgroundSettings
-		bind:bgImage
-		bind:bgBlur
-		bind:bgOpacity
-		bind:isBgDragOver
-		onBgImageUpload={handleBgImageUpload}
-		onBgDragOver={handleBgDragOver}
-		onBgDragLeave={handleBgDragLeave}
-		onBgDrop={handleBgDrop}
-	/>
-{/snippet}
-
-{#snippet styleSettings()}
-	<SizeSettings
-		bind:fontSize
-		bind:iconSize
-		bind:iconRadius
-		bind:gap
-		bind:linkScale
-		onFontSizeChange={handleFontSizeChange}
-		onIconSizeChange={handleIconSizeChange}
-	/>
-	<ColorSettings
-		bind:color
-		bind:iconColor
-		bind:bgColor
-		bind:bgColorOpacity
-		bind:linkColor
-		bind:useOriginalIconColor
-		onColorChange={handleColorChange}
-	/>
-	<IconBackgroundSettings
-		bind:iconBgEnabled
-		bind:iconBgColor
-		bind:iconBgPadding
-		bind:iconBgRadius
-		bind:iconBgBlur
-		bind:iconBgOpacity
-	/>
-	<ShadowSettings
-		bind:shadowTarget
-		{textShadow}
-		{iconShadow}
-		onUpdateShadow={updateShadow}
-	/>
-{/snippet}
-
-{#snippet exportSettings()}
-	<ExportSettings
-		bind:ratios
-		bind:exportConfig
+<div class="space-y-8">
+	<CoverPreview
+		bind:svgContainer
 		{canvasWidth}
 		{canvasHeight}
-		{activeRatios}
-		onExport={doExport}
+		{visualRatios}
+		{bgImage}
+		{bgImageX}
+		{bgImageY}
+		{bgImageScale}
+		{bgBlur}
+		{bgOpacity}
+		{bgColor}
+		{bgColorOpacity}
+		{leftText}
+		{rightText}
+		{fontSize}
+		{fontWeight}
+		{customFontName}
+		{color}
+		{textShadow}
+		{gap}
+		{showIcon}
+		{iconSvg}
+		{localIcon}
+		{iconSize}
+		{iconBgPadding}
+		{iconBgEnabled}
+		{iconBgColor}
+		{iconBgOpacity}
+		{iconBgBlur}
+		{iconBgRadius}
+		{useOriginalIconColor}
+		{iconColor}
+		{iconShadow}
+		{iconRadius}
+		{isDragging}
+		onPointerDown={handlePointerDown}
+		onPointerMove={handlePointerMove}
+		onPointerUp={handlePointerUp}
+		onWheel={handleWheel}
 	/>
-{/snippet}
 
-<div class="min-h-screen">
-	<div class="mb-6 px-1">
-		<h1 class="text-2xl font-bold">封面制作</h1>
-		<p class="text-sm text-muted-foreground mt-1">在线生成精美的封面图片</p>
-	</div>
-
-	<div class="flex flex-col lg:flex-row gap-6 w-full">
-		<div class="flex-1 lg:min-w-0">
-			<div class="lg:sticky lg:top-20">
-				<CoverPreview
-					bind:svgContainer
-					{canvasWidth}
-					{canvasHeight}
-					{visualRatios}
-					{bgImage}
-					{bgImageX}
-					{bgImageY}
-					{bgImageScale}
-					{bgBlur}
-					{bgOpacity}
-					{bgColor}
-					{bgColorOpacity}
-					{leftText}
-					{rightText}
-					{fontSize}
-					{fontWeight}
-					{customFontName}
-					{color}
-					{textShadow}
-					{gap}
-					{showIcon}
-					{iconSvg}
-					{localIcon}
-					{iconSize}
-					{iconBgPadding}
-					{iconBgEnabled}
-					{iconBgColor}
-					{iconBgOpacity}
-					{iconBgBlur}
-					{iconBgRadius}
-					{useOriginalIconColor}
-					{iconColor}
-					{iconShadow}
-					{iconRadius}
-					{isDragging}
-					onPointerDown={handlePointerDown}
-					onPointerMove={handlePointerMove}
-					onPointerUp={handlePointerUp}
-					onWheel={handleWheel}
-				/>
-			</div>
-		</div>
-
-		<div class="w-full lg:w-[420px] xl:w-[480px] shrink-0">
-			<Tabs.Root bind:value={activeTab} class="w-full">
-				<Tabs.List class="grid w-full grid-cols-3">
-					<Tabs.Trigger value="content">内容</Tabs.Trigger>
-					<Tabs.Trigger value="style">样式</Tabs.Trigger>
-					<Tabs.Trigger value="export">导出</Tabs.Trigger>
-				</Tabs.List>
-				<Tabs.Content value="content" class="space-y-4 mt-4">
-					{@render contentSettings()}
-				</Tabs.Content>
-				<Tabs.Content value="style" class="space-y-4 mt-4">
-					{@render styleSettings()}
-				</Tabs.Content>
-				<Tabs.Content value="export" class="space-y-4 mt-4">
-					{@render exportSettings()}
-				</Tabs.Content>
-			</Tabs.Root>
-		</div>
+	<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+		<TextSettings
+			bind:leftText
+			bind:rightText
+			bind:fontWeight
+			bind:customFontName
+			onFontUpload={handleFontUpload}
+			onSystemFontSelect={handleSystemFontSelect}
+			onRemoveFont={() => {
+				if (customFont) URL.revokeObjectURL(customFont);
+				customFont = null;
+				customFontName = '';
+				fontArrayBuffer = null;
+				fontMimeType = '';
+			}}
+		/>
+		<IconSettings
+			bind:showIcon
+			bind:localIcon
+			bind:searchQuery
+			bind:searchResults
+			bind:iconName
+			onLocalIconUpload={handleLocalIconUpload}
+			{onSearchInput}
+			onSelectIcon={selectIcon}
+		/>
+		<BackgroundSettings
+			bind:bgImage
+			bind:bgBlur
+			bind:bgOpacity
+			bind:isBgDragOver
+			onBgImageUpload={handleBgImageUpload}
+			onBgDragOver={handleBgDragOver}
+			onBgDragLeave={handleBgDragLeave}
+			onBgDrop={handleBgDrop}
+		/>
+		<SizeSettings
+			bind:fontSize
+			bind:iconSize
+			bind:iconRadius
+			bind:gap
+			bind:linkScale
+			onFontSizeChange={handleFontSizeChange}
+			onIconSizeChange={handleIconSizeChange}
+		/>
+		<ColorSettings
+			bind:color
+			bind:iconColor
+			bind:bgColor
+			bind:bgColorOpacity
+			bind:linkColor
+			bind:useOriginalIconColor
+			onColorChange={handleColorChange}
+		/>
+		<IconBackgroundSettings
+			bind:iconBgEnabled
+			bind:iconBgColor
+			bind:iconBgPadding
+			bind:iconBgRadius
+			bind:iconBgBlur
+			bind:iconBgOpacity
+		/>
+		<ShadowSettings
+			bind:shadowTarget
+			{textShadow}
+			{iconShadow}
+			onUpdateShadow={updateShadow}
+		/>
+		<ExportSettings
+			bind:ratios
+			bind:exportConfig
+			{canvasWidth}
+			{canvasHeight}
+			{activeRatios}
+			onExport={doExport}
+		/>
 	</div>
 </div>
