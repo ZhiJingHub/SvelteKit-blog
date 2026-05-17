@@ -99,8 +99,9 @@
 				)}%</Label
 			>
 			<Slider
-				value={[shadowTarget === 'icon' ? iconShadow.alpha : textShadow.alpha]}
-				onValueChange={(v: number[]) => onUpdateShadow('alpha', v[0])}
+				type="single"
+				value={shadowTarget === 'icon' ? iconShadow.alpha : textShadow.alpha}
+				onValueChange={(v: number) => onUpdateShadow('alpha', v)}
 				min={0}
 				max={1}
 				step={0.01}

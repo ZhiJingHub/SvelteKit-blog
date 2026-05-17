@@ -6,11 +6,13 @@
 	let {
 		ref = $bindable(null),
 		value = $bindable(),
+		type = "single",
 		class: className,
 		...restProps
 	}: {
 		ref?: HTMLSpanElement | null;
 		value?: number | number[];
+		type?: "single" | "multiple";
 		class?: ClassValue;
 		[key: string]: unknown;
 	} = $props();
@@ -19,7 +21,7 @@
 <SliderPrimitive.Root
 	bind:ref
 	bind:value={value as never}
-	type="single"
+	{type}
 	data-slot="slider"
 	class={cn(
 		"relative flex w-full touch-none items-center select-none data-disabled:opacity-50",

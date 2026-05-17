@@ -99,8 +99,9 @@
 		<div class="space-y-2">
 			<Label>字体粗细: {fontWeight}</Label>
 			<Slider
-				value={[fontWeight]}
-				onValueChange={(v: number[]) => (fontWeight = v[0])}
+				type="single"
+				value={fontWeight}
+				onValueChange={(v: number) => (fontWeight = v)}
 				min={100}
 				max={900}
 				step={100}

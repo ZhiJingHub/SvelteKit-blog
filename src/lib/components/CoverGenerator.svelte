@@ -11,16 +11,13 @@
 	import ShadowSettings from './cover/ShadowSettings.svelte';
 	import ExportSettings from './cover/ExportSettings.svelte';
 
-	// 窗口响应式
 	let innerWidth = $state(0);
 	let isDesktop = $derived(innerWidth >= 1024);
 
-	// 文本状态
 	let leftText = $state('鸣潮');
 	let rightText = $state('牛逼');
 	let fontWeight = $state(400);
 
-	// 图标状态
 	let iconName = $state('arcticons:wuthering-waves');
 	let iconSize = $state(64);
 	let iconSvg = $state('');
@@ -35,27 +32,23 @@
 	let searchDebounce: ReturnType<typeof setTimeout>;
 	let activeTab = $state('content');
 
-	// 字体状态
 	let fontSize = $state(64);
 	let customFont = $state<string | null>(null);
 	let customFontName = $state('');
-	let customFontData = $state<string | null>(null);
+	let fontArrayBuffer: ArrayBuffer | null = null;
+	let fontMimeType = '';
 
-	// 间距
 	let gap = $state(20);
 
-	// 颜色状态
 	let color = $state('#000000');
 	let bgColor = $state('#ffffff');
 	let bgColorOpacity = $state(1);
 	let linkColor = $state(true);
 
-	// 阴影状态
 	let textShadow = $state({ x: 0, y: 0, blur: 0, color: '#000000', alpha: 0 });
 	let iconShadow = $state({ x: 0, y: 0, blur: 0, color: '#000000', alpha: 0 });
 	let shadowTarget = $state<'both' | 'text' | 'icon'>('both');
 
-	// 图标背景状态
 	let iconBgEnabled = $state(false);
 	let iconBgRadius = $state(20);
 	let iconBgColor = $state('#000000');
@@ -63,7 +56,6 @@
 	let iconBgBlur = $state(0);
 	let iconBgPadding = $state(10);
 
-	// 背景图片状态
 	let bgImage = $state<string | null>(null);
 	let bgImageX = $state(0);
 	let bgImageY = $state(0);
@@ -73,7 +65,6 @@
 	let isBgDragOver = $state(false);
 	let isDragging = $state(false);
 
-	// 比例状态
 	let ratios = $state([
 		{ label: '1:1', w: 1, h: 1, checked: false },
 		{ label: '4:3', w: 4, h: 3, checked: false },
@@ -81,12 +72,10 @@
 		{ label: '21:9', w: 21, h: 9, checked: false }
 	]);
 
-	// 缩放链接状态
 	let linkScale = $state(true);
 	let lastFontSize = $state(64);
 	let lastIconSize = $state(64);
 
-	// 导出配置
 	let exportConfig = $state({
 		format: 'png' as 'png' | 'svg',
 		scales: [1] as number[],
@@ -95,10 +84,8 @@
 		exportRatios: [] as string[]
 	});
 
-	// Canvas 引用
 	let svgContainer: SVGSVGElement | undefined = $state();
 
-	// 拖拽状态
 	let dragStartX = 0;
 	let dragStartY = 0;
 	let initialImageX = 0;
@@ -107,7 +94,8 @@
 	let initialPinchDistance = 0;
 	let initialScale = 1;
 
-	// 计算画布尺寸
+	let iconFetchController: AbortController | null = null;
+
 	const BASE_HEIGHT = 600;
 	let activeRatios = $derived(ratios.filter((r) => r.checked));
 	let visualRatios = $derived(activeRatios.length > 0 ? activeRatios : [ratios[2]]);
@@ -117,12 +105,23 @@
 	let canvasWidth = $derived(Math.round(BASE_HEIGHT * maxWidthRatio));
 	let canvasHeight = $derived(BASE_HEIGHT);
 
-	// 辅助函数
 	function hexToRgba(hex: string, alpha: number) {
 		const r = parseInt(hex.slice(1, 3), 16);
 		const g = parseInt(hex.slice(3, 5), 16);
 		const b = parseInt(hex.slice(5, 7), 16);
 		return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+	}
+
+	function getFontDataBase64(): string | null {
+		if (!fontArrayBuffer) return null;
+		const bytes = new Uint8Array(fontArrayBuffer);
+		const chunks: string[] = [];
+		const chunkSize = 8192;
+		for (let i = 0; i < bytes.length; i += chunkSize) {
+			const chunk = bytes.subarray(i, i + chunkSize);
+			chunks.push(String.fromCharCode(...chunk));
+		}
+		return `data:${fontMimeType};base64,${btoa(chunks.join(''))}`;
 	}
 
 	function updateShadow(key: string, value: string | number) {
@@ -144,26 +143,24 @@
 		}
 	}
 
-	function handleFontSizeChange(value: number[]) {
-		const newVal = value[0];
+	function handleFontSizeChange(value: number) {
 		if (linkScale) {
-			const ratio = newVal / lastFontSize;
+			const ratio = value / lastFontSize;
 			iconSize = Math.round(iconSize * ratio);
 			lastIconSize = iconSize;
 		}
-		fontSize = newVal;
-		lastFontSize = newVal;
+		fontSize = value;
+		lastFontSize = value;
 	}
 
-	function handleIconSizeChange(value: number[]) {
-		const newVal = value[0];
+	function handleIconSizeChange(value: number) {
 		if (linkScale) {
-			const ratio = newVal / lastIconSize;
+			const ratio = value / lastIconSize;
 			fontSize = Math.round(fontSize * ratio);
 			lastFontSize = fontSize;
 		}
-		iconSize = newVal;
-		lastIconSize = newVal;
+		iconSize = value;
+		lastIconSize = value;
 	}
 
 	function handleBgImageUpload(e: Event) {
@@ -173,45 +170,40 @@
 
 	function loadBgImageFile(file: File) {
 		if (!file.type.startsWith('image/')) return;
-		const reader = new FileReader();
-		reader.onload = (e) => {
-			bgImage = e.target?.result as string;
-			bgImageX = 0;
-			bgImageY = 0;
-			bgImageScale = 1;
-			bgBlur = 0;
-			bgOpacity = 1;
-		};
-		reader.readAsDataURL(file);
+		if (bgImage?.startsWith('blob:')) URL.revokeObjectURL(bgImage);
+		const url = URL.createObjectURL(file);
+		bgImage = url;
+		bgImageX = 0;
+		bgImageY = 0;
+		bgImageScale = 1;
+		bgBlur = 0;
+		bgOpacity = 1;
 	}
 
 	function handleFontUpload(e: Event) {
 		const file = (e.target as HTMLInputElement).files?.[0];
-		if (file) {
-			if (customFont) URL.revokeObjectURL(customFont);
-			const reader = new FileReader();
-			reader.onload = (e) => {
-			const fontData = e.target?.result as ArrayBuffer;
+		if (!file) return;
+		if (customFont) URL.revokeObjectURL(customFont);
+		const reader = new FileReader();
+		reader.onload = (ev) => {
+			const fontData = ev.target?.result as ArrayBuffer;
 			customFontName = file.name.replace(/\.[^/.]+$/, '');
 			customFont = URL.createObjectURL(new Blob([fontData]));
-			const bytes = new Uint8Array(fontData);
-			let binary = '';
-			for (let i = 0; i < bytes.length; i++) {
-				binary += String.fromCharCode(bytes[i]);
-			}
-			customFontData = `data:${file.type || 'application/octet-stream'};base64,${btoa(binary)}`;
+			fontArrayBuffer = fontData;
+			fontMimeType = file.type || 'application/octet-stream';
 			const fontFace = new FontFace(customFontName, `url(${customFont})`);
-				fontFace.load().then((loadedFace) => {
-					document.fonts.add(loadedFace);
-				});
-			};
-			reader.readAsArrayBuffer(file);
-		}
+			fontFace.load().then((loadedFace) => {
+				document.fonts.add(loadedFace);
+			});
+		};
+		reader.readAsArrayBuffer(file);
 	}
 
 	function handleSystemFontSelect(fontName: string) {
 		customFontName = fontName;
 		customFont = null;
+		fontArrayBuffer = null;
+		fontMimeType = '';
 	}
 
 	async function handleSearch() {
@@ -226,8 +218,7 @@
 			);
 			const data = await res.json();
 			searchResults = data.icons || [];
-		} catch (e) {
-			console.error(e);
+		} catch {
 			searchResults = [];
 		} finally {
 			isSearching = false;
@@ -247,15 +238,12 @@
 
 	function handleLocalIconUpload(e: Event) {
 		const file = (e.target as HTMLInputElement).files?.[0];
-		if (file) {
-			const reader = new FileReader();
-			reader.onload = (e) => {
-				localIcon = e.target?.result as string;
-				iconName = '本地图片';
-				iconSvg = '';
-			};
-			reader.readAsDataURL(file);
-		}
+		if (!file) return;
+		if (localIcon?.startsWith('blob:')) URL.revokeObjectURL(localIcon);
+		const url = URL.createObjectURL(file);
+		localIcon = url;
+		iconName = '本地图片';
+		iconSvg = '';
 	}
 
 	function selectIcon(icon: string) {
@@ -349,20 +337,57 @@
 
 		const svgClone = svgContainer.cloneNode(true) as SVGSVGElement;
 
-	if (exportConfig.transparentBg) {
-		const bgRects = svgClone.querySelectorAll('.bg-fill');
-		for (const r of bgRects) r.remove();
-		const checkerboard = svgClone.querySelector('#checkerboard');
-		if (checkerboard?.parentElement) checkerboard.parentElement.remove();
-	}
+		if (exportConfig.transparentBg) {
+			const bgRects = svgClone.querySelectorAll('.bg-fill');
+			for (const r of bgRects) r.remove();
+			const checkerboard = svgClone.querySelector('#checkerboard');
+			if (checkerboard?.parentElement) checkerboard.parentElement.remove();
+		}
 
-	if (customFontData) {
-		const style = document.createElementNS('http://www.w3.org/2000/svg', 'style');
-		style.textContent = `@font-face { font-family: '${customFontName}'; src: url(${customFontData}); }`;
-		svgClone.insertBefore(style, svgClone.firstChild);
-	}
+		const fontBase64 = getFontDataBase64();
+		if (fontBase64) {
+			const style = document.createElementNS('http://www.w3.org/2000/svg', 'style');
+			style.textContent = `@font-face { font-family: '${customFontName}'; src: url(${fontBase64}); }`;
+			svgClone.insertBefore(style, svgClone.firstChild);
+		}
 
-	const ratiosToExport =
+		if (bgImage) {
+			const imgEl = svgClone.querySelector('image[href]');
+			if (imgEl && bgImage.startsWith('blob:')) {
+				try {
+					const response = await fetch(bgImage);
+					const blob = await response.blob();
+					const dataUrl = await new Promise<string>((resolve) => {
+						const reader = new FileReader();
+						reader.onload = () => resolve(reader.result as string);
+						reader.readAsDataURL(blob);
+					});
+					imgEl.setAttribute('href', dataUrl);
+				} catch {
+					// keep original
+				}
+			}
+		}
+
+		if (localIcon) {
+			const localImgEl = svgClone.querySelector('img[src]');
+			if (localImgEl && localIcon.startsWith('blob:')) {
+				try {
+					const response = await fetch(localIcon);
+					const blob = await response.blob();
+					const dataUrl = await new Promise<string>((resolve) => {
+						const reader = new FileReader();
+						reader.onload = () => resolve(reader.result as string);
+						reader.readAsDataURL(blob);
+					});
+					localImgEl.setAttribute('src', dataUrl);
+				} catch {
+					// keep original
+				}
+			}
+		}
+
+		const ratiosToExport =
 			exportConfig.exportRatios.length > 0
 				? ratios.filter((r) => exportConfig.exportRatios.includes(r.label))
 				: activeRatios;
@@ -389,12 +414,12 @@
 				downloadLink(url, `${ratioFilename}.svg`);
 				setTimeout(() => URL.revokeObjectURL(url), 1000);
 			} else {
-			const img = new Image();
-			img.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgData)}`;
-			await new Promise<void>((resolve, reject) => {
-				img.onload = () => resolve();
-				img.onerror = () => reject(new Error('Image export failed'));
-			});
+				const img = new Image();
+				img.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgData)}`;
+				await new Promise<void>((resolve, reject) => {
+					img.onload = () => resolve();
+					img.onerror = () => reject(new Error('Image export failed'));
+				});
 
 				const scales = exportConfig.scales.length > 0 ? exportConfig.scales : [1];
 				for (const scale of scales) {
@@ -426,46 +451,56 @@
 	}
 
 	$effect(() => {
-		if (iconName?.includes(':')) {
-			const [prefix, name] = iconName.split(':');
-			fetch(`https://api.iconify.design/${prefix}/${name}.svg`)
+		const currentIconName = iconName;
+		const currentUseOriginal = useOriginalIconColor;
+
+		if (currentIconName?.includes(':')) {
+			if (iconFetchController) iconFetchController.abort();
+			iconFetchController = new AbortController();
+
+			const [prefix, name] = currentIconName.split(':');
+			fetch(`https://api.iconify.design/${prefix}/${name}.svg`, {
+				signal: iconFetchController.signal
+			})
 				.then((res) => {
 					if (!res.ok) throw new Error('Icon not found');
 					return res.text();
 				})
 				.then((svg) => {
 					let processedSvg = svg
-					.replace(/(<svg[^>]*>)\s*/, '$1')
-					.replace(/<svg\s([^>]*?)\s+width="[^"]*"/g, '<svg $1')
-					.replace(/<svg\s([^>]*?)\s+height="[^"]*"/g, '<svg $1');
+						.replace(/(<svg[^>]*>)\s*/, '$1')
+						.replace(/<svg\s([^>]*?)\s+width="[^"]*"/g, '<svg $1')
+						.replace(/<svg\s([^>]*?)\s+height="[^"]*"/g, '<svg $1');
 					processedSvg = processedSvg.replace(
 						/<svg\b([^>]*)>/,
 						'<svg$1 width="100%" height="100%" preserveAspectRatio="xMidYMid meet">'
 					);
-					if (!useOriginalIconColor) {
+					if (!currentUseOriginal) {
 						processedSvg = processedSvg.replace(/fill="[^"]*"/g, 'fill="currentColor"');
 					}
 					iconSvg = processedSvg;
 				})
-				.catch(() => {
-					iconSvg = '';
+				.catch((e) => {
+					if (e.name !== 'AbortError') iconSvg = '';
 				});
 		} else {
 			iconSvg = '';
 		}
+
+		return () => {
+			if (iconFetchController) iconFetchController.abort();
+		};
 	});
 
 	onMount(() => {
 		innerWidth = window.innerWidth;
-		bgColor = '#ffffff';
-		color = '#000000';
-		iconColor = '#000000';
-		textShadow = { x: 0, y: 0, blur: 0, color: '#000000', alpha: 0 };
-		iconShadow = { x: 0, y: 0, blur: 0, color: '#000000', alpha: 0 };
 	});
 
 	onDestroy(() => {
 		if (customFont) URL.revokeObjectURL(customFont);
+		if (bgImage?.startsWith('blob:')) URL.revokeObjectURL(bgImage);
+		if (localIcon?.startsWith('blob:')) URL.revokeObjectURL(localIcon);
+		if (iconFetchController) iconFetchController.abort();
 		clearTimeout(searchDebounce);
 	});
 </script>
@@ -481,10 +516,12 @@
 		onFontUpload={handleFontUpload}
 		onSystemFontSelect={handleSystemFontSelect}
 		onRemoveFont={() => {
-		customFont = null;
-		customFontName = '';
-		customFontData = null;
-	}}
+			if (customFont) URL.revokeObjectURL(customFont);
+			customFont = null;
+			customFontName = '';
+			fontArrayBuffer = null;
+			fontMimeType = '';
+		}}
 	/>
 	<IconSettings
 		bind:showIcon
@@ -555,7 +592,6 @@
 {/snippet}
 
 <div class="flex flex-col lg:flex-row gap-6 w-full">
-	<!-- 左侧：预览区域 -->
 	<div class="flex-1 lg:max-w-[55%]">
 		<div class="lg:sticky lg:top-20">
 			<CoverPreview
@@ -603,7 +639,6 @@
 		</div>
 	</div>
 
-	<!-- 右侧：控制面板 -->
 	<div class="w-full lg:flex-1">
 		{#if isDesktop}
 			<div class="grid grid-cols-3 gap-6">

@@ -136,20 +136,20 @@
 			/>
 		{/if}
 
-		<foreignObject x="0" y="0" width="100%" height="100%" style="pointer-events: none;">
-			<div
-				xmlns="http://www.w3.org/1999/xhtml"
-				style="
-					width: 100%; 
-					height: 100%; 
-					display: flex; 
-					align-items: center; 
-					justify-content: center; 
-					gap: {gap}px;
-					font-family: {customFontName || 'sans-serif'};
-					font-weight: {fontWeight};
-				"
-			>
+		<foreignObject x="0" y="0" width={canvasWidth} height={canvasHeight} style="pointer-events: none;">
+		<div
+			xmlns="http://www.w3.org/1999/xhtml"
+			style="
+				width: {canvasWidth}px; 
+				height: {canvasHeight}px; 
+				display: flex; 
+				align-items: center; 
+				justify-content: center; 
+				gap: {gap}px;
+				font-family: {customFontName || 'sans-serif'};
+				font-weight: {fontWeight};
+			"
+		>
 				<span
 					style="
 						font-size: {fontSize}px; 
