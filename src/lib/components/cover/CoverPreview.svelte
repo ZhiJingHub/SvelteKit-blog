@@ -121,7 +121,7 @@
 		</defs>
 
 		<rect width="100%" height="100%" fill="url(#checkerboard)" />
-		<rect width="100%" height="100%" fill={hexToRgba(bgColor, bgColorOpacity)} />
+		<rect class="bg-fill" width="100%" height="100%" fill={hexToRgba(bgColor, bgColorOpacity)} />
 
 		{#if bgImage}
 			<image
@@ -130,8 +130,8 @@
 				y={bgImageY}
 				width={canvasWidth}
 				height={canvasHeight}
-				transform="scale({bgImageScale})"
-				style="transform-origin: 50% 50%; filter: blur({bgBlur}px); opacity: {bgOpacity};"
+				transform="translate({canvasWidth / 2}, {canvasHeight / 2}) scale({bgImageScale}) translate({-canvasWidth / 2}, {-canvasHeight / 2})"
+				style="filter: blur({bgBlur}px); opacity: {bgOpacity};"
 				preserveAspectRatio="xMidYMid meet"
 			/>
 		{/if}

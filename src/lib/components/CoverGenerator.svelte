@@ -12,7 +12,7 @@
 	import ExportSettings from './cover/ExportSettings.svelte';
 
 	// 窗口响应式
-	let innerWidth = $state(typeof window !== 'undefined' ? window.innerWidth : 1200);
+	let innerWidth = $state(0);
 	let isDesktop = $derived(innerWidth >= 1024);
 
 	// 文本状态
@@ -96,7 +96,7 @@
 	});
 
 	// Canvas 引用
-	let svgContainer = $state<SVGSVGElement>();
+	let svgContainer: SVGSVGElement | undefined = $state();
 
 	// 拖拽状态
 	let dragStartX = 0;
@@ -349,6 +349,13 @@
 
 		const svgClone = svgContainer.cloneNode(true) as SVGSVGElement;
 
+	if (exportConfig.transparentBg) {
+		const bgRects = svgClone.querySelectorAll('.bg-fill');
+		for (const r of bgRects) r.remove();
+		const checkerboard = svgClone.querySelector('#checkerboard');
+		if (checkerboard?.parentElement) checkerboard.parentElement.remove();
+	}
+
 	if (customFontData) {
 		const style = document.createElementNS('http://www.w3.org/2000/svg', 'style');
 		style.textContent = `@font-face { font-family: '${customFontName}'; src: url(${customFontData}); }`;
@@ -428,8 +435,9 @@
 				})
 				.then((svg) => {
 					let processedSvg = svg
-					.replace(/\s+width="[^"]*"/g, '')
-					.replace(/\s+height="[^"]*"/g, '');
+					.replace(/(<svg[^>]*>)\s*/, '$1')
+					.replace(/<svg\s([^>]*?)\s+width="[^"]*"/g, '<svg $1')
+					.replace(/<svg\s([^>]*?)\s+height="[^"]*"/g, '<svg $1');
 					processedSvg = processedSvg.replace(
 						/<svg\b([^>]*)>/,
 						'<svg$1 width="100%" height="100%" preserveAspectRatio="xMidYMid meet">'
@@ -448,6 +456,7 @@
 	});
 
 	onMount(() => {
+		innerWidth = window.innerWidth;
 		bgColor = '#ffffff';
 		color = '#000000';
 		iconColor = '#000000';
