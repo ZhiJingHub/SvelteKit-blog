@@ -7,4 +7,6 @@
 	<title>封面制作 - {siteConfig.title}</title>
 </svelte:head>
 
-<CoverGenerator />
+<div class="container mx-auto max-w-7xl px-4 py-8">
+	<CoverGenerator />
+</div>

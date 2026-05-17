@@ -332,6 +332,10 @@
 		if (border) (border as SVGElement).style.display = 'none';
 
 		const svgClone = svgContainer.cloneNode(true) as SVGSVGElement;
+		svgClone.setAttribute('width', canvasWidth.toString());
+		svgClone.setAttribute('height', canvasHeight.toString());
+		svgClone.removeAttribute('class');
+		svgClone.removeAttribute('style');
 
 		if (exportConfig.transparentBg) {
 			const bgRects = svgClone.querySelectorAll('.bg-fill');
@@ -357,8 +361,7 @@
 						reader.readAsDataURL(blob);
 					});
 					imgEl.setAttribute('href', dataUrl);
-				} catch {
-				}
+				} catch {}
 			}
 		}
 
@@ -374,8 +377,7 @@
 						reader.readAsDataURL(blob);
 					});
 					localImgEl.setAttribute('src', dataUrl);
-				} catch {
-				}
+				} catch {}
 			}
 		}
 
@@ -543,43 +545,33 @@
 			onWheel={handleWheel}
 		/>
 
-		<div class="export-bar">
-			<Button onclick={doExport} disabled={activeRatios.length === 0} class="flex-1" size="lg">
-				<Icon icon="mdi:download" class="mr-2 h-5 w-5" />
-				导出图片
-			</Button>
-			<ExportSettings
-				bind:ratios
-				bind:exportConfig
-				{canvasWidth}
-				{canvasHeight}
-				{activeRatios}
-				onExport={doExport}
-			/>
-		</div>
+		<Button onclick={doExport} disabled={activeRatios.length === 0} class="w-full" size="lg">
+			<Icon icon="mdi:download" class="mr-2 h-5 w-5" />
+			导出图片
+		</Button>
 	</div>
 
 	<div class="cover-settings-col">
 		<Root value="text" class="w-full">
 			<TabsList class="w-full">
 				<TabsTrigger value="text">
-					<Icon icon="mdi:format-text" class="mr-1.5 h-4 w-4" />
+					<Icon icon="mdi:format-text" class="mr-1 h-4 w-4" />
 					文本
 				</TabsTrigger>
 				<TabsTrigger value="icon">
-					<Icon icon="mdi:image-outline" class="mr-1.5 h-4 w-4" />
+					<Icon icon="mdi:image-outline" class="mr-1 h-4 w-4" />
 					图标
 				</TabsTrigger>
 				<TabsTrigger value="background">
-					<Icon icon="mdi:image-area" class="mr-1.5 h-4 w-4" />
+					<Icon icon="mdi:image-area" class="mr-1 h-4 w-4" />
 					背景
 				</TabsTrigger>
 				<TabsTrigger value="style">
-					<Icon icon="mdi:palette-outline" class="mr-1.5 h-4 w-4" />
+					<Icon icon="mdi:palette-outline" class="mr-1 h-4 w-4" />
 					样式
 				</TabsTrigger>
 				<TabsTrigger value="export">
-					<Icon icon="mdi:cog-outline" class="mr-1.5 h-4 w-4" />
+					<Icon icon="mdi:cog-outline" class="mr-1 h-4 w-4" />
 					导出
 				</TabsTrigger>
 			</TabsList>
@@ -684,6 +676,22 @@
 		gap: 1.5rem;
 	}
 
+	.cover-preview-col {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+		width: 100%;
+		min-width: 0;
+	}
+
+	.cover-settings-col {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+		width: 100%;
+		min-width: 0;
+	}
+
 	@media (min-width: 1024px) {
 		.cover-layout {
 			flex-direction: row;
@@ -693,41 +701,23 @@
 
 		.cover-preview-col {
 			flex: 1;
+			min-width: 0;
 			position: sticky;
 			top: 1.5rem;
 		}
 
 		.cover-settings-col {
-			width: 420px;
+			width: 400px;
 			flex-shrink: 0;
 			max-height: calc(100vh - 3rem);
 			overflow-y: auto;
-			padding-right: 0.25rem;
 		}
 	}
 
 	@media (min-width: 1280px) {
 		.cover-settings-col {
-			width: 480px;
+			width: 460px;
 		}
-	}
-
-	.cover-preview-col {
-		display: flex;
-		flex-direction: column;
-		gap: 1rem;
-	}
-
-	.export-bar {
-		display: flex;
-		gap: 0.75rem;
-		align-items: center;
-	}
-
-	.cover-settings-col {
-		display: flex;
-		flex-direction: column;
-		gap: 0.75rem;
 	}
 
 	.cover-settings-col :global([data-slot="tabs-content"]) {
@@ -742,27 +732,26 @@
 	}
 
 	.cover-settings-col :global([data-slot="card"]) {
-		padding: 0;
-		gap: 0;
+		padding: 0 !important;
+		gap: 0 !important;
 	}
 
 	.cover-settings-col :global([data-slot="card-header"]) {
-		padding: 0.75rem 1rem 0.25rem;
+		padding: 0.625rem 0.875rem 0.125rem !important;
 	}
 
 	.cover-settings-col :global([data-slot="card-content"]) {
-		padding: 0.5rem 1rem 1rem;
+		padding: 0.5rem 0.875rem 0.875rem !important;
 	}
 
 	.cover-settings-col :global([data-slot="card-title"]) {
-		font-size: 0.875rem;
-		font-weight: 600;
+		font-size: 0.8125rem !important;
 	}
 
 	.cover-settings-col :global([data-slot="tabs-trigger"]) {
 		font-size: 0.8125rem;
 		gap: 0.25rem;
-		padding: 0.5rem 0.75rem;
+		padding: 0.375rem 0.625rem;
 	}
 
 	.cover-settings-col::-webkit-scrollbar {

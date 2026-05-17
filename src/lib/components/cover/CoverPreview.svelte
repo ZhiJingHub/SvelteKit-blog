@@ -100,11 +100,10 @@
 >
 	<svg
 		bind:this={svgContainer}
-		width={canvasWidth}
-		height={canvasHeight}
 		viewBox="0 0 {canvasWidth} {canvasHeight}"
 		xmlns="http://www.w3.org/2000/svg"
-		style="cursor: {bgImage ? (isDragging ? 'grabbing' : 'grab') : 'default'};"
+		class="preview-svg"
+		style="cursor: {bgImage ? (isDragging ? 'grabbing' : 'grab') : 'default'}; aspect-ratio: {canvasWidth}/{canvasHeight};"
 		onwheel={onWheel}
 	>
 		<rect class="bg-fill" width="100%" height="100%" fill={hexToRgba(bgColor, bgColorOpacity)} />
@@ -263,10 +262,9 @@
 		overflow: hidden;
 	}
 
-	.preview-area svg {
-		max-width: 100%;
-		max-height: 70vh;
-		height: auto;
+	.preview-svg {
+		width: 100%;
+		max-height: 60vh;
 		border-radius: 0.25rem;
 		box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
 	}
