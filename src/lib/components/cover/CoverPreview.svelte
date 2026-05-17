@@ -256,25 +256,22 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		background-image:
-			linear-gradient(45deg, #f0f0f0 25%, transparent 25%),
-			linear-gradient(-45deg, #f0f0f0 25%, transparent 25%),
-			linear-gradient(45deg, transparent 75%, #f0f0f0 75%),
-			linear-gradient(-45deg, transparent 75%, #f0f0f0 75%);
-		background-size: 16px 16px;
-		background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+		background-color: #fafafa;
+		background-image: radial-gradient(circle, #d4d4d4 0.8px, transparent 0.8px);
+		background-size: 20px 20px;
 		border-radius: 0.75rem;
 		padding: 1.5rem;
 		overflow: hidden;
+		border: 1px solid hsl(var(--border));
 	}
 
 	.preview-svg {
 		width: 100%;
 		max-height: 60vh;
-		border-radius: 0.25rem;
-		box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-		outline: 1px dashed rgba(0, 0, 0, 0.15);
-		outline-offset: -1px;
+		border-radius: 0.375rem;
+		box-shadow:
+			0 0 0 1px rgba(0, 0, 0, 0.06),
+			0 2px 8px rgba(0, 0, 0, 0.08);
 	}
 
 	.icon-svg-box {
