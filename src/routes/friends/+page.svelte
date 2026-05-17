@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '$lib/components/ui/card';
 	import * as Pagination from '$lib/components/ui/pagination';
+	import PageViews from '$lib/components/PageViews.svelte';
 	import { siteConfig } from '$lib/config/site';
 	import type { PageData } from './$types';
 
@@ -112,5 +113,8 @@
 				</div>
 			{/if}
 		{/if}
+	</div>
+	<div class="mt-6 text-center text-sm text-muted-foreground">
+		<PageViews pathname="/friends/" />
 	</div>
 </div>

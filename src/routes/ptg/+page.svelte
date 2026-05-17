@@ -8,6 +8,7 @@
 	import { Switch } from '$lib/components/ui/switch';
 	import { Alert, AlertDescription } from '$lib/components/ui/alert';
 	import Icon from '@iconify/svelte';
+	import PageViews from '$lib/components/PageViews.svelte';
 	import { siteConfig } from '$lib/config/site';
 
 	type ToolMode = 'prism' | 'shadow';
@@ -287,5 +288,8 @@
 				</CardContent>
 			</Card>
 		</section>
+	</div>
+	<div class="mt-6 text-center text-sm text-muted-foreground">
+		<PageViews pathname="/ptg/" />
 	</div>
 </div>
