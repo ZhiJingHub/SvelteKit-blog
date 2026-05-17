@@ -2,6 +2,7 @@
 	import { tick } from 'svelte';
 	import { fly } from 'svelte/transition';
 	import { tocFloating } from '$lib/stores/toc-floating';
+	import { slugify } from '$lib/utils/slugify';
 
 	let {
 		container,
@@ -25,18 +26,6 @@
 	function indentClass(level: number): string {
 		const depth = Math.max(0, level - minLevel);
 		return ['pl-3', 'pl-6', 'pl-9', 'pl-12', 'pl-14'][depth] ?? 'pl-14';
-	}
-
-	function slugify(text: string): string {
-		return (
-			text
-				.trim()
-				.toLowerCase()
-				.replace(/[\s　]+/g, '-')
-				.replace(/[^\p{L}\p{N}\-]/gu, '')
-				.replace(/-+/g, '-')
-				.replace(/^-|-$/g, '') || 'section'
-		);
 	}
 
 	async function rebuild() {

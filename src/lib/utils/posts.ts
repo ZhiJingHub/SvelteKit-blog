@@ -2,7 +2,11 @@ import type { Post, PostMetadata } from '$lib/types/post';
 
 const postModules = import.meta.glob('/src/content/posts/**/index.md', { eager: true });
 
+let cachedPosts: Post[] | null = null;
+
 export function getAllPosts(): Post[] {
+	if (cachedPosts) return cachedPosts;
+
 	const posts: Post[] = [];
 
 	for (const [path, module] of Object.entries(postModules)) {
@@ -19,16 +23,17 @@ export function getAllPosts(): Post[] {
 		});
 	}
 
-	return posts.sort((a, b) => {
+	cachedPosts = posts.sort((a, b) => {
 		if (a.metadata.pinned && !b.metadata.pinned) return -1;
 		if (!a.metadata.pinned && b.metadata.pinned) return 1;
 		return new Date(b.metadata.date || b.metadata.published).getTime() - new Date(a.metadata.date || a.metadata.published).getTime();
 	});
+
+	return cachedPosts;
 }
 
 export function getPostBySlug(slug: string): Post | undefined {
-	const posts = getAllPosts();
-	return posts.find((post) => post.slug === slug);
+	return getAllPosts().find((post) => post.slug === slug);
 }
 
 export async function getPostComponent(slug: string) {

@@ -9,19 +9,28 @@
 		class: className = '',
 		prefix = '',
 		suffix = '次浏览',
-		increment = true
+		increment = true,
+		initialCount
 	}: {
 		pathname: string;
 		class?: string;
 		prefix?: string;
 		suffix?: string;
 		increment?: boolean;
+		initialCount?: number;
 	} = $props();
 
 	let count = $state<number | null>(null);
 
+	$effect(() => {
+		if (initialCount !== undefined) {
+			count = initialCount;
+		}
+	});
+
 	onMount(async () => {
 		if (!browser) return;
+		if (initialCount !== undefined) return;
 
 		const key = pathname.replace(/\/$/, '') || '/';
 

@@ -7,6 +7,7 @@
 	import Icon from '@iconify/svelte';
 	import { siteConfig } from '$lib/config/site';
 	import { spaCache } from '$lib/utils/spaCache';
+	import { batchGetViews } from '$lib/utils/batchViews';
 	import PageViews from '$lib/components/PageViews.svelte';
 	import type { PageData } from './$types';
 
@@ -22,6 +23,17 @@
 	const postsPerPage = 10;
 
 	let expandedCards = $state<Record<string, boolean>>({});
+
+	let viewCounts = $state<Record<string, number>>({});
+
+	$effect(() => {
+		const paths = posts.map((p) => `/posts/${p.slug}`);
+		batchGetViews(paths).then((result) => {
+			const counts: Record<string, number> = {};
+			result.forEach((c, p) => { counts[p] = c; });
+			viewCounts = counts;
+		});
+	});
 
 	let searchFilters = $state({
 		title: true,
@@ -255,7 +267,7 @@
 									</time>
 									<span class="shrink-0 text-sm text-muted-foreground">· {post.stats.wordCount.toLocaleString()} 字</span>
 									<span class="shrink-0 text-sm text-muted-foreground">· 约 {post.stats.readTime} 分钟</span>
-									<PageViews pathname="/posts/{post.slug}/" class="shrink-0 text-sm text-muted-foreground" prefix="· " increment={false} />
+									<PageViews pathname="/posts/{post.slug}/" class="shrink-0 text-sm text-muted-foreground" prefix="· " increment={false} initialCount={viewCounts[`/posts/${post.slug}`]} />
 								</div>
 
 								<h2 class="mb-2 text-xl sm:text-2xl font-semibold group-hover:text-primary break-words">

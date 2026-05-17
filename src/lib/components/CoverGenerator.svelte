@@ -10,6 +10,7 @@
 	import IconBackgroundSettings from './cover/IconBackgroundSettings.svelte';
 	import ShadowSettings from './cover/ShadowSettings.svelte';
 	import ExportSettings from './cover/ExportSettings.svelte';
+	import { hexToRgba } from '$lib/utils/color';
 
 	let innerWidth = $state(0);
 	let isDesktop = $derived(innerWidth >= 1024);
@@ -104,13 +105,6 @@
 	);
 	let canvasWidth = $derived(Math.round(BASE_HEIGHT * maxWidthRatio));
 	let canvasHeight = $derived(BASE_HEIGHT);
-
-	function hexToRgba(hex: string, alpha: number) {
-		const r = parseInt(hex.slice(1, 3), 16);
-		const g = parseInt(hex.slice(3, 5), 16);
-		const b = parseInt(hex.slice(5, 7), 16);
-		return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-	}
 
 	function getFontDataBase64(): string | null {
 		if (!fontArrayBuffer) return null;
@@ -630,7 +624,6 @@
 				{iconShadow}
 				{iconRadius}
 				{isDragging}
-				{hexToRgba}
 				onPointerDown={handlePointerDown}
 				onPointerMove={handlePointerMove}
 				onPointerUp={handlePointerUp}

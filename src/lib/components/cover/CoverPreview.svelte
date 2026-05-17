@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { hexToRgba } from '$lib/utils/color';
+
 	type Ratio = { label: string; w: number; h: number; checked: boolean };
 
 	let {
@@ -37,7 +39,6 @@
 		iconShadow,
 		iconRadius,
 		isDragging,
-		hexToRgba,
 		onPointerDown,
 		onPointerMove,
 		onPointerUp,
@@ -78,7 +79,6 @@
 		iconShadow: { x: number; y: number; blur: number; color: string; alpha: number };
 		iconRadius: number;
 		isDragging: boolean;
-		hexToRgba: (hex: string, alpha: number) => string;
 		onPointerDown: (e: PointerEvent) => void;
 		onPointerMove: (e: PointerEvent) => void;
 		onPointerUp: (e: PointerEvent) => void;
