@@ -219,8 +219,8 @@
 			width={canvasWidth}
 			height={canvasHeight}
 			fill="none"
-			stroke="rgba(255,255,255,0.15)"
-			stroke-width="2"
+			stroke="rgba(0,0,0,0.12)"
+			stroke-width="1"
 			class="canvas-border"
 		/>
 
@@ -269,9 +269,8 @@
 		width: 100%;
 		max-height: 60vh;
 		border-radius: 0.375rem;
-		box-shadow:
-			0 0 0 1px rgba(0, 0, 0, 0.06),
-			0 2px 8px rgba(0, 0, 0, 0.08);
+		border: 1px solid rgba(0, 0, 0, 0.12);
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 	}
 
 	.icon-svg-box {
