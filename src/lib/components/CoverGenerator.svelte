@@ -13,13 +13,12 @@
 	import { hexToRgba } from '$lib/utils/color';
 
 	let innerWidth = $state(0);
-	let isDesktop = $derived(innerWidth >= 1024);
 
 	let leftText = $state('左侧文字');
 	let rightText = $state('右侧文字');
 	let fontWeight = $state(400);
 
-	let iconName = $state('arcticons:wuthering-waves');
+	let iconName = $state('logos:svelte-icon');
 	let iconSize = $state(64);
 	let iconSvg = $state('');
 	let localIcon = $state<string | null>(null);
@@ -585,86 +584,76 @@
 	/>
 {/snippet}
 
-<div class="flex flex-col lg:flex-row gap-6 w-full">
-	<div class="flex-1 lg:max-w-[55%]">
-		<div class="lg:sticky lg:top-20">
-			<CoverPreview
-				bind:svgContainer
-				{canvasWidth}
-				{canvasHeight}
-				{visualRatios}
-				{bgImage}
-				{bgImageX}
-				{bgImageY}
-				{bgImageScale}
-				{bgBlur}
-				{bgOpacity}
-				{bgColor}
-				{bgColorOpacity}
-				{leftText}
-				{rightText}
-				{fontSize}
-				{fontWeight}
-				{customFontName}
-				{color}
-				{textShadow}
-				{gap}
-				{showIcon}
-				{iconSvg}
-				{localIcon}
-				{iconSize}
-				{iconBgPadding}
-				{iconBgEnabled}
-				{iconBgColor}
-				{iconBgOpacity}
-				{iconBgBlur}
-				{iconBgRadius}
-				{useOriginalIconColor}
-				{iconColor}
-				{iconShadow}
-				{iconRadius}
-				{isDragging}
-				onPointerDown={handlePointerDown}
-				onPointerMove={handlePointerMove}
-				onPointerUp={handlePointerUp}
-				onWheel={handleWheel}
-			/>
-		</div>
+<div class="min-h-screen">
+	<div class="mb-6 px-1">
+		<h1 class="text-2xl font-bold">封面制作</h1>
+		<p class="text-sm text-muted-foreground mt-1">在线生成精美的封面图片</p>
 	</div>
 
-	<div class="w-full lg:flex-1">
-		{#if isDesktop}
-			<div class="grid grid-cols-3 gap-6">
-				<div class="space-y-6">
-					<h2 class="text-lg font-semibold mb-4">内容</h2>
-					{@render contentSettings()}
-				</div>
-				<div class="space-y-6">
-					<h2 class="text-lg font-semibold mb-4">样式</h2>
-					{@render styleSettings()}
-				</div>
-				<div class="space-y-6">
-					<h2 class="text-lg font-semibold mb-4">导出</h2>
-					{@render exportSettings()}
-				</div>
+	<div class="flex flex-col lg:flex-row gap-6 w-full">
+		<div class="flex-1 lg:min-w-0">
+			<div class="lg:sticky lg:top-20">
+				<CoverPreview
+					bind:svgContainer
+					{canvasWidth}
+					{canvasHeight}
+					{visualRatios}
+					{bgImage}
+					{bgImageX}
+					{bgImageY}
+					{bgImageScale}
+					{bgBlur}
+					{bgOpacity}
+					{bgColor}
+					{bgColorOpacity}
+					{leftText}
+					{rightText}
+					{fontSize}
+					{fontWeight}
+					{customFontName}
+					{color}
+					{textShadow}
+					{gap}
+					{showIcon}
+					{iconSvg}
+					{localIcon}
+					{iconSize}
+					{iconBgPadding}
+					{iconBgEnabled}
+					{iconBgColor}
+					{iconBgOpacity}
+					{iconBgBlur}
+					{iconBgRadius}
+					{useOriginalIconColor}
+					{iconColor}
+					{iconShadow}
+					{iconRadius}
+					{isDragging}
+					onPointerDown={handlePointerDown}
+					onPointerMove={handlePointerMove}
+					onPointerUp={handlePointerUp}
+					onWheel={handleWheel}
+				/>
 			</div>
-		{:else}
+		</div>
+
+		<div class="w-full lg:w-[420px] xl:w-[480px] shrink-0">
 			<Tabs.Root bind:value={activeTab} class="w-full">
 				<Tabs.List class="grid w-full grid-cols-3">
 					<Tabs.Trigger value="content">内容</Tabs.Trigger>
 					<Tabs.Trigger value="style">样式</Tabs.Trigger>
 					<Tabs.Trigger value="export">导出</Tabs.Trigger>
 				</Tabs.List>
-				<Tabs.Content value="content" class="space-y-6 mt-6">
+				<Tabs.Content value="content" class="space-y-4 mt-4">
 					{@render contentSettings()}
 				</Tabs.Content>
-				<Tabs.Content value="style" class="space-y-6 mt-6">
+				<Tabs.Content value="style" class="space-y-4 mt-4">
 					{@render styleSettings()}
 				</Tabs.Content>
-				<Tabs.Content value="export" class="space-y-6 mt-6">
+				<Tabs.Content value="export" class="space-y-4 mt-4">
 					{@render exportSettings()}
 				</Tabs.Content>
 			</Tabs.Root>
-		{/if}
+		</div>
 	</div>
 </div>
