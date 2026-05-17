@@ -256,7 +256,13 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		background: #1a1a2e;
+		background-image:
+			linear-gradient(45deg, #f0f0f0 25%, transparent 25%),
+			linear-gradient(-45deg, #f0f0f0 25%, transparent 25%),
+			linear-gradient(45deg, transparent 75%, #f0f0f0 75%),
+			linear-gradient(-45deg, transparent 75%, #f0f0f0 75%);
+		background-size: 16px 16px;
+		background-position: 0 0, 0 8px, 8px -8px, -8px 0;
 		border-radius: 0.75rem;
 		padding: 1.5rem;
 		overflow: hidden;
@@ -266,7 +272,9 @@
 		width: 100%;
 		max-height: 60vh;
 		border-radius: 0.25rem;
-		box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+		box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+		outline: 1px dashed rgba(0, 0, 0, 0.15);
+		outline-offset: -1px;
 	}
 
 	.icon-svg-box {
