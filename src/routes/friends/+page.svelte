@@ -32,7 +32,7 @@
 		<Card>
 			<CardHeader>
 				<CardTitle>我的友链信息</CardTitle>
-				<CardDescription>欢迎交换友链，请在你的站点添加以下信息后 <a href="https://github.com/ZhiJingHub/SvelteKit-blog/issues/new?template=friend-link.yml" target="_blank" rel="noopener noreferrer" class="text-primary underline underline-offset-2">提交 Issue 申请</a></CardDescription>
+				<CardDescription>欢迎交换友链，请在你的站点添加以下信息后 <a href="https://github.com/ZhiJingHub/SvelteKit-blog/issues/new/choose" target="_blank" rel="noopener noreferrer" class="text-primary underline underline-offset-2">提交 Issue 申请</a>。你也可以在 <a href="https://github.com/ZhiJingHub/SvelteKit-blog/issues" target="_blank" rel="noopener noreferrer" class="text-primary underline underline-offset-2">Issue 页面</a> 反馈问题或提出建议。</CardDescription>
 			</CardHeader>
 			<CardContent>
 				<div class="flex flex-col sm:flex-row gap-6">
