@@ -52,7 +52,7 @@
 						</div>
 						<div>
 							<span class="text-muted-foreground">站点描述：</span>
-							<code class="rounded bg-muted px-1.5 py-0.5">{siteConfig.description}</code>
+							<code class="rounded bg-muted px-1.5 py-0.5">{siteConfig.bio.bio}</code>
 						</div>
 						<div>
 							<span class="text-muted-foreground">头像地址：</span>

@@ -4,7 +4,7 @@ export const siteConfig = {
 	subtitle: 'A personal blog',
 	url: 'https://iwexe.top',
 	icon: '/favicon.svg',
-	description: '一个专注于技术分享的个人博客',
+	description: '这里没有固定内容与题材，随心记录生活日常、所思所想、各类见闻杂谈，分享平淡日子里的点滴思绪',
 	keywords: ['blog', 'tech', '技术博客'],
 	lang: 'zh_CN',
 	ogImage: '/og-image.svg',
