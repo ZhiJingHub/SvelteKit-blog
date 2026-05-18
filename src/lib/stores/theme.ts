@@ -24,7 +24,7 @@ export const isDark = derived(themeMode, ($mode) => {
 	return $mode === 'dark';
 });
 
-function applyTheme(dark: boolean) {
+async function applyTheme(dark: boolean) {
 	if (!browser) return;
 	const el = document.documentElement;
 	if (dark) {
@@ -34,6 +34,11 @@ function applyTheme(dark: boolean) {
 	}
 	const meta = document.querySelector('meta[name="theme-color"]');
 	if (meta) meta.setAttribute('content', dark ? '#0a0a0a' : '#ffffff');
+
+	try {
+		const { rerenderAllMermaid } = await import('$lib/utils/mermaid');
+		rerenderAllMermaid();
+	} catch { /* mermaid not loaded */ }
 }
 
 if (browser) {

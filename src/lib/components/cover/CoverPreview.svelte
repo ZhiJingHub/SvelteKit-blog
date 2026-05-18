@@ -256,8 +256,8 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		background-color: #fafafa;
-		background-image: radial-gradient(circle, #d4d4d4 0.8px, transparent 0.8px);
+		background-color: var(--muted);
+		background-image: radial-gradient(circle, var(--border) 0.8px, transparent 0.8px);
 		background-size: 20px 20px;
 		border-radius: 0.75rem;
 		padding: 1.5rem;
@@ -269,7 +269,7 @@
 		width: 100%;
 		max-height: 60vh;
 		border-radius: 0.375rem;
-		border: 1px solid rgba(0, 0, 0, 0.12);
+		border: 1px solid var(--border);
 		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 	}
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte';
+	import { onDestroy } from 'svelte';
 	import CoverPreview from './cover/CoverPreview.svelte';
 	import TextSettings from './cover/TextSettings.svelte';
 	import IconSettings from './cover/IconSettings.svelte';
@@ -15,8 +15,6 @@
 	import TabsContent from '$lib/components/ui/tabs/tabs-content.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import Icon from '@iconify/svelte';
-
-	let innerWidth = $state(0);
 
 	let leftText = $state('');
 	let rightText = $state('');
@@ -486,10 +484,6 @@
 		};
 	});
 
-	onMount(() => {
-		innerWidth = window.innerWidth;
-	});
-
 	onDestroy(() => {
 		if (customFont) URL.revokeObjectURL(customFont);
 		if (bgImage?.startsWith('blob:')) URL.revokeObjectURL(bgImage);
@@ -498,8 +492,6 @@
 		clearTimeout(searchDebounce);
 	});
 </script>
-
-<svelte:window bind:innerWidth />
 
 <div class="cover-layout">
 	<div class="cover-preview-col">
