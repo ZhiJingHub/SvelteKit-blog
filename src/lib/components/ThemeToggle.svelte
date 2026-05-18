@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Icon from '@iconify/svelte';
-	import { themeMode, type ThemeMode } from '$lib/stores/theme';
+	import { themeMode, isDark, type ThemeMode } from '$lib/stores/theme';
 
 	const modes: ThemeMode[] = ['light', 'dark', 'system'];
 
@@ -12,8 +12,9 @@
 	}
 
 	let currentMode = $state<ThemeMode>('system');
-	$effect(() => {
-		currentMode = $themeMode;
+
+	themeMode.subscribe((v) => {
+		currentMode = v;
 	});
 
 	let icon = $derived(

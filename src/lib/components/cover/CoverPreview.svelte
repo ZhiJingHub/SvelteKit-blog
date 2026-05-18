@@ -262,7 +262,7 @@
 		border-radius: 0.75rem;
 		padding: 1.5rem;
 		overflow: hidden;
-		border: 1px solid hsl(var(--border));
+		border: 1px solid var(--border);
 	}
 
 	.preview-svg {

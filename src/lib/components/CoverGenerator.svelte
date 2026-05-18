@@ -18,8 +18,8 @@
 
 	let innerWidth = $state(0);
 
-	let leftText = $state('左侧文字');
-	let rightText = $state('右侧文字');
+	let leftText = $state('');
+	let rightText = $state('');
 	let fontWeight = $state(400);
 
 	let iconName = $state('logos:svelte-icon');
@@ -763,7 +763,7 @@
 	}
 
 	.cover-settings-col::-webkit-scrollbar-thumb {
-		background: hsl(var(--border));
+		background: var(--border);
 		border-radius: 2px;
 	}
 </style>
