@@ -15,7 +15,7 @@ export const siteConfig = {
 	bio: {
 		avatar: '/avatar.svg',
 		name: '致靖',
-		bio: 'Stay hungry, stay foolish.',
+		bio: 'Go with the flow.',
 		links: [
 			{
 				name: 'GitHub',

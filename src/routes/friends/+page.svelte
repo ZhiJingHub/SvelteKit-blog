@@ -43,7 +43,7 @@
 					<div class="flex-1 space-y-3 text-sm">
 						<div>
 							<span class="text-muted-foreground">站点名称：</span>
-							<code class="rounded bg-muted px-1.5 py-0.5">{siteConfig.bio.name}</code>
+							<code class="rounded bg-muted px-1.5 py-0.5">{siteConfig.name}</code>
 						</div>
 						<div>
 							<span class="text-muted-foreground">站点地址：</span>
@@ -52,7 +52,7 @@
 						</div>
 						<div>
 							<span class="text-muted-foreground">站点描述：</span>
-							<code class="rounded bg-muted px-1.5 py-0.5">{siteConfig.bio.bio}</code>
+							<code class="rounded bg-muted px-1.5 py-0.5">{siteConfig.description}</code>
 						</div>
 						<div>
 							<span class="text-muted-foreground">头像地址：</span>
