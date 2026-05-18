@@ -1,6 +1,6 @@
 export const siteConfig = {
-	name: 'My Blog',
-	title: 'My Blog',
+	name: "ZhiJing\u2019s Blog",
+	title: "ZhiJing\u2019s Blog",
 	subtitle: 'A personal blog',
 	url: 'https://iwexe.top',
 	icon: '/favicon.svg',
